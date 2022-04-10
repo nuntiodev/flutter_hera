@@ -6,8 +6,8 @@ import 'package:dart_softcorp_blocks/block_user.pbgrpc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
-class UserClient {
-  UserClient({
+class UserBlock {
+  UserBlock({
     required UserServiceClient grpcUserClient,
     required Authorize authorize,
     required String? jwtPublicKey,
@@ -17,10 +17,11 @@ class UserClient {
     _authorize = authorize;
     _encryptionKey = encryptionKey;
     _jwtPublicKey = jwtPublicKey;
+    _storage = FlutterSecureStorage();
   }
 
   // Create storage which is used to store tokens
-  final storage = FlutterSecureStorage();
+  late final FlutterSecureStorage _storage;
 
   // _grpcUserClient is an object to communicate with the mobile_blocks
   late final UserServiceClient _grpcUserClient;
@@ -50,51 +51,51 @@ class UserClient {
     if (_currentUser.id != "") {
       return _currentUser;
     }
-    var jsonCurrentUser = await storage.read(key: _currentUserKey);
+    var jsonCurrentUser = await _storage.read(key: _currentUserKey);
     if (jsonCurrentUser != "") {
       _currentUser = jsonDecode(jsonCurrentUser!);
-      return _currentUser!;
+      return _currentUser;
     }
     return User();
   }
 
   void _setCurrentUser(User currentUser) async {
     _currentUser = currentUser;
-    storage.write(key: _currentUserKey, value: jsonEncode(currentUser));
+    _storage.write(key: _currentUserKey, value: jsonEncode(currentUser));
   }
 
   Future<String> getAccessToken() async {
     if (_accessToken != "") {
       return _accessToken;
     }
-    var accessToken = await storage.read(key: _accessTokenKey);
+    var accessToken = await _storage.read(key: _accessTokenKey);
     if (accessToken != "") {
       _accessToken = accessToken!;
-      return accessToken!;
+      return accessToken;
     }
     return "";
   }
 
   void _setAccessToken(String accessToken) async {
     _accessToken = accessToken;
-    storage.write(key: _accessTokenKey, value: accessToken);
+    _storage.write(key: _accessTokenKey, value: accessToken);
   }
 
   Future<String> _getRefreshToken() async {
     if (_refreshToken != "") {
       return _refreshToken;
     }
-    var refreshToken = await storage.read(key: _refreshTokenKey);
+    var refreshToken = await _storage.read(key: _refreshTokenKey);
     if (refreshToken != "") {
       _refreshToken = refreshToken!;
-      return refreshToken!;
+      return refreshToken;
     }
     return "";
   }
 
   void _setRefreshToken(String refreshToken) async {
     _refreshToken = refreshToken;
-    storage.write(key: _refreshTokenKey, value: refreshToken);
+    _storage.write(key: _refreshTokenKey, value: refreshToken);
   }
 
   Future<User> create({

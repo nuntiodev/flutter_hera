@@ -1,11 +1,11 @@
-import 'package:dart_blocks/mobile_blocks/user_client/user_client.dart';
+import 'package:dart_blocks/mobile_blocks/user_block/user_block.dart';
 import 'package:dart_blocks/softcorp_authorize/softcorp_authorize.dart';
 import 'package:dart_blocks/softcorp_credentials/softcorp_credentials.dart';
 import 'package:dart_softcorp_cloud/cloud_project.pbgrpc.dart';
 import 'package:grpc/grpc.dart';
 import 'package:dart_softcorp_blocks/block_user.pbgrpc.dart';
 
-class BlocksClient {
+class SoftcorpClient {
   // _encryptionKey  is used to encrypt clients data under the given key
   static late String _encryptionKey;
 
@@ -25,7 +25,7 @@ class BlocksClient {
   static late ProjectServiceClient _grpcProjectClient;
 
   // userClient is used to make requests
-  static late UserClient userClient;
+  static late UserBlock userBlock;
 
   static Future<void> initialize(
       {required String apiKey,
@@ -62,7 +62,7 @@ class BlocksClient {
     UserResponse publicKeysResp =
         await _grpcUserClient.publicKeys(publicKeysReq);
     String? jwtPublicKey = publicKeysResp.publicKeys["public-jwt-key"];
-    userClient = UserClient(
+    userBlock = UserBlock(
       grpcUserClient: _grpcUserClient,
       encryptionKey: _encryptionKey,
       jwtPublicKey: jwtPublicKey,
