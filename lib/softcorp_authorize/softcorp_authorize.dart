@@ -6,14 +6,17 @@ abstract class Authorize {
 }
 
 class SoftcorpAuthorize implements Authorize {
-  // _grpcProjectClient is an object to communicate with the server
+  // _grpcProjectClient is an object to communicate with the mobile_blocks
   late final ProjectServiceClient _grpcProjectClient;
-  // _apiKey used to authorize requests
-  late final String _apiKey;
-  // _accessToken is used to connect clients to the api
-  late String _accessToken;
 
-  SoftcorpAuthorize({required ProjectServiceClient projectClient, required String apiKey}) {
+  // _apiKey used to authorize requests
+  String _apiKey = "";
+
+  // _accessToken is used to connect clients to the api
+  String _accessToken = "";
+
+  SoftcorpAuthorize(
+      {required ProjectServiceClient projectClient, required String apiKey}) {
     _grpcProjectClient = projectClient;
     _apiKey = apiKey;
   }
@@ -21,19 +24,25 @@ class SoftcorpAuthorize implements Authorize {
   @override
   Future<String> getAccessToken() async {
     // check if we have valid existing tokens
-    if(_accessToken != ""){
+    if (_accessToken != "") {
       // validate tokens
-      if(!JwtDecoder.isExpired(_accessToken)){
-        return _accessToken;
+      try {
+        if (JwtDecoder.isExpired(_accessToken) == false) {
+          return _accessToken;
+        }
+      } catch(e){
+        print("could not validate expiration date of token");
       }
     }
-    if(!JwtDecoder.isExpired(_apiKey)){
-      throw Exception("api key is expired or otherwise malformed");
+    try {
+      ProjectRequest req = ProjectRequest();
+      req.privateKey = _apiKey;
+      ProjectResponse resp = await _grpcProjectClient.generateAccessToken(req);
+      _accessToken = resp.accessToken;
+      return _accessToken;
+    } catch (e) {
+      print("could not get access token");
+      rethrow;
     }
-    ProjectRequest req = ProjectRequest();
-    req.privateKey = _apiKey;
-    ProjectResponse resp = await _grpcProjectClient.generateAccessToken(req);
-    _accessToken = resp.accessToken;
-    return _accessToken;
   }
 }

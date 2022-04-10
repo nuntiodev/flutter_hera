@@ -1,16 +1,20 @@
 name: dart_blocks
-description: A simple command-line application.
-version: 1.0.0
-# homepage: https://www.example.com
+description: An SDK written in Dart to communicate with Softcorp Blocks and Cloud
+version: 0.0.23
+homepage: https://github.com/softcorp-io
 
 environment:
   sdk: '>=2.15.1 <3.0.0'
 
 
 dependencies:
-  dart_softcorp_blocks: ^0.0.2
+  dart_softcorp_blocks: ^0.0.4
   dart_softcorp_cloud: ^0.0.1
   jwt_decoder: ^2.0.1
+  protobuf: ^2.0.1
+  grpc: ^3.0.2
+  fixnum: ^1.0.0
+  dart_jsonwebtoken: ^2.4.1
 
 dev_dependencies:
   lints: ^1.0.0
