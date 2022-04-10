@@ -25,7 +25,7 @@ class BlocksClient {
   static late ProjectServiceClient _grpcProjectClient;
 
   // userClient is used to make requests
-  static UserClient? userClient;
+  static late UserClient userClient;
 
   static Future<void> initialize(
       {required String apiKey,

@@ -3,18 +3,10 @@ import 'dart:convert';
 import 'package:dart_blocks/softcorp_authorize/softcorp_authorize.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:dart_softcorp_blocks/block_user.pbgrpc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 class UserClient {
-  // _grpcUserClient is an object to communicate with the mobile_blocks
-  late final UserServiceClient _grpcUserClient;
-  late final String? _encryptionKey;
-  late final String? _jwtPublicKey;
-  late final Authorize _authorize;
-  User currentUser = User();
-  String accessToken = "";
-  String _refreshToken = "";
-
   UserClient({
     required UserServiceClient grpcUserClient,
     required Authorize authorize,
@@ -25,6 +17,84 @@ class UserClient {
     _authorize = authorize;
     _encryptionKey = encryptionKey;
     _jwtPublicKey = jwtPublicKey;
+  }
+
+  // Create storage which is used to store tokens
+  final storage = FlutterSecureStorage();
+
+  // _grpcUserClient is an object to communicate with the mobile_blocks
+  late final UserServiceClient _grpcUserClient;
+
+  // _encryptionKey is used to encrypt users
+  late final String? _encryptionKey;
+
+  // _jwtPublicKey is used to validate auth sessions
+  late final String? _jwtPublicKey;
+
+  // _authorize is used to retrieve access token
+  late final Authorize _authorize;
+
+  // currentUser is created after user logs in
+  User _currentUser = User();
+  final String _currentUserKey = "softcorp-blocks-current-user";
+
+  // accessToken is used to authenticate user
+  String _accessToken = "";
+  final String _accessTokenKey = "softcorp-blocks-access-token";
+
+  // _refreshToken is used to get a new accessToken
+  String _refreshToken = "";
+  final String _refreshTokenKey = "softcorp-blocks-refresh-token";
+
+  Future<User> getCurrentUser() async {
+    if (_currentUser.id != "") {
+      return _currentUser;
+    }
+    var jsonCurrentUser = await storage.read(key: _currentUserKey);
+    if (jsonCurrentUser != "") {
+      _currentUser = jsonDecode(jsonCurrentUser!);
+      return _currentUser!;
+    }
+    return User();
+  }
+
+  void _setCurrentUser(User currentUser) async {
+    _currentUser = currentUser;
+    storage.write(key: _currentUserKey, value: jsonEncode(currentUser));
+  }
+
+  Future<String> getAccessToken() async {
+    if (_accessToken != "") {
+      return _accessToken;
+    }
+    var accessToken = await storage.read(key: _accessTokenKey);
+    if (accessToken != "") {
+      _accessToken = accessToken!;
+      return accessToken!;
+    }
+    return "";
+  }
+
+  void _setAccessToken(String accessToken) async {
+    _accessToken = accessToken;
+    storage.write(key: _accessTokenKey, value: accessToken);
+  }
+
+  Future<String> _getRefreshToken() async {
+    if (_refreshToken != "") {
+      return _refreshToken;
+    }
+    var refreshToken = await storage.read(key: _refreshTokenKey);
+    if (refreshToken != "") {
+      _refreshToken = refreshToken!;
+      return refreshToken!;
+    }
+    return "";
+  }
+
+  void _setRefreshToken(String refreshToken) async {
+    _refreshToken = refreshToken;
+    storage.write(key: _refreshTokenKey, value: refreshToken);
   }
 
   Future<User> create({
@@ -71,14 +141,14 @@ class UserClient {
       throw Exception(
           "missing one required identifier: userId, optionalId or email");
     }
-    String accessToken = await _authorize.getAccessToken();
+    String cloudToken = await _authorize.getAccessToken();
     UserRequest req = UserRequest();
     User user = User();
     user.id = userId ?? "";
     user.optionalId = optionalId ?? "";
     user.email = email ?? "";
     user.password = password;
-    req.cloudToken = accessToken;
+    req.cloudToken = cloudToken;
     req.encryptionKey = _encryptionKey ?? "";
     req.user = user;
     try {
@@ -89,9 +159,9 @@ class UserClient {
       if (resp.user.id == "") {
         throw Exception("user is null. Contact info@softcorp.io");
       }
-      currentUser = resp.user;
-      accessToken = resp.token.accessToken;
-      _refreshToken = resp.token.refreshToken;
+      _setCurrentUser(resp.user);
+      _setAccessToken(resp.token.accessToken);
+      _setRefreshToken(resp.token.refreshToken);
     } catch (e) {
       print("could not create user");
       rethrow;
@@ -99,9 +169,11 @@ class UserClient {
   }
 
   Future<bool> isAuthenticated() async {
-    if (currentUser.id != "") {
+    if ((await getCurrentUser()).id != "") {
       try {
-        if (JwtDecoder.getRemainingTime(accessToken).inMinutes < 2) {
+        var accessToken = await getAccessToken();
+        if (accessToken != "" &&
+            JwtDecoder.getRemainingTime(accessToken).inMinutes < 2) {
           try {
             if (_jwtPublicKey != "") {
               throw Exception("empty jwt public  key");
@@ -114,10 +186,10 @@ class UserClient {
         }
         // token is expired - refresh
         UserRequest req = UserRequest();
-        req.token = Token()..refreshToken = _refreshToken;
+        req.token = Token()..refreshToken = await _getRefreshToken();
         UserResponse refreshResp = await _grpcUserClient.refreshToken(req);
-        _refreshToken = refreshResp.token.refreshToken;
-        accessToken = refreshResp.token.accessToken;
+        _setAccessToken(refreshResp.token.accessToken);
+        _setRefreshToken(refreshResp.token.refreshToken);
       } catch (e) {
         return false;
       }
