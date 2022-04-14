@@ -1,4 +1,4 @@
-import 'package:dart_blocks/mobile_blocks/user_block/user_block.dart';
+import 'package:dart_blocks/mobile_dart_blocks/user_block/user_block.dart';
 import 'package:dart_blocks/softcorp_authorize/softcorp_authorize.dart';
 import 'package:dart_blocks/softcorp_credentials/softcorp_credentials.dart';
 import 'package:dart_softcorp_cloud/cloud_project.pbgrpc.dart';
@@ -18,24 +18,25 @@ class SoftcorpClient {
   // _namespace defines what namespace you want to use with Softcorp Blocks (only edit this if you know what you are doing)
   static late String _namespace;
 
-  // _grpcUserClient is an object to communicate with the mobile_blocks
+  // _grpcUserClient is an object to communicate with the mobile_dart_blocks
   static late UserServiceClient _grpcUserClient;
 
-  // _grpcUserClient is an object to communicate with the mobile_blocks
+  // _grpcUserClient is an object to communicate with the mobile_dart_blocks
   static late ProjectServiceClient _grpcProjectClient;
 
   // userClient is used to make requests
   static late UserBlock userBlock;
 
-  static Future<void> initialize(
-      {required String apiKey,
-      String? encryptionKey,
-      String? apiUrl,
-      String? namespace,
-      TransportCredentials? transportCredentials}) async {
+  static Future<void> initialize({
+    String? apiKey,
+    String? encryptionKey,
+    String? apiUrl,
+    String? namespace,
+    TransportCredentials? transportCredentials,
+  }) async {
     // set values
     _encryptionKey = encryptionKey ?? "";
-    _apiKey = apiKey;
+    _apiKey = apiKey ?? "";
     _namespace = namespace ?? "";
     _apiUrl = apiUrl ?? _apiUrl;
     // build uri
@@ -61,6 +62,7 @@ class SoftcorpClient {
     publicKeysReq.cloudToken = await authorize.getAccessToken();
     UserResponse publicKeysResp =
         await _grpcUserClient.publicKeys(publicKeysReq);
+    //todo: find out why this is empty
     String? jwtPublicKey = publicKeysResp.publicKeys["public-jwt-key"];
     userBlock = UserBlock(
       grpcUserClient: _grpcUserClient,

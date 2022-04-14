@@ -1,6 +1,6 @@
 name: dart_blocks
 description: An SDK written in Dart to communicate with Softcorp Blocks and Cloud
-version: 0.0.28
+version: 0.0.85
 homepage: https://github.com/softcorp-io
 
 environment:
@@ -8,6 +8,8 @@ environment:
 
 
 dependencies:
+  flutter:
+    sdk: flutter
   dart_softcorp_blocks: ^0.0.4
   dart_softcorp_cloud: ^0.0.1
   jwt_decoder: ^2.0.1

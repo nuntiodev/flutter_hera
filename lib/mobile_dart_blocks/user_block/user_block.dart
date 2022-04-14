@@ -12,6 +12,8 @@ class UserBlock {
     required Authorize authorize,
     required String? jwtPublicKey,
     String? encryptionKey,
+    Function? onLogin,
+    Function? onLogout,
   }) {
     _grpcUserClient = grpcUserClient;
     _authorize = authorize;
@@ -23,7 +25,7 @@ class UserBlock {
   // Create storage which is used to store tokens
   late final FlutterSecureStorage _storage;
 
-  // _grpcUserClient is an object to communicate with the mobile_blocks
+  // _grpcUserClient is an object to communicate with the mobile_dart_blocks
   late final UserServiceClient _grpcUserClient;
 
   // _encryptionKey is used to encrypt users
@@ -53,7 +55,7 @@ class UserBlock {
     }
     var jsonCurrentUser = await _storage.read(key: _currentUserKey);
     if (jsonCurrentUser != "") {
-      _currentUser = jsonDecode(jsonCurrentUser!);
+      _currentUser = User.fromJson(jsonCurrentUser!);
       return _currentUser;
     }
     return User();
@@ -61,7 +63,7 @@ class UserBlock {
 
   void _setCurrentUser(User currentUser) async {
     _currentUser = currentUser;
-    _storage.write(key: _currentUserKey, value: jsonEncode(currentUser));
+    _storage.write(key: _currentUserKey, value: currentUser.writeToJson());
   }
 
   Future<String> getAccessToken() async {
@@ -107,7 +109,6 @@ class UserBlock {
     bool? validatePassword,
     dynamic metadata,
   }) async {
-    String accessToken = await _authorize.getAccessToken();
     UserRequest req = UserRequest();
     User user = User();
     user.id = userId ?? "";
@@ -116,7 +117,7 @@ class UserBlock {
     user.image = image ?? "";
     user.password = password ?? "";
     req.validatePassword = validatePassword ?? false;
-    req.cloudToken = accessToken;
+    req.cloudToken = await _authorize.getAccessToken();
     req.encryptionKey = _encryptionKey ?? "";
     req.user = user;
     if (metadata != null) {
@@ -164,17 +165,39 @@ class UserBlock {
       _setAccessToken(resp.token.accessToken);
       _setRefreshToken(resp.token.refreshToken);
     } catch (e) {
-      print("could not create user");
+      print("could not login user");
       rethrow;
     }
   }
 
+  Future<void> logout() async {
+    if (await isAuthenticated() == false) {
+      throw Exception("user is currently not logged in");
+    }
+    // block current access token
+    UserRequest req = UserRequest();
+    req.cloudToken = await getAccessToken();
+    req.tokenPointer = await getAccessToken();
+    _grpcUserClient.blockToken(req);
+    // block current refresh token
+    req.tokenPointer = await _getRefreshToken();
+    _grpcUserClient.blockToken(req);
+    // remove from secure storage
+    _storage.delete(key: _currentUserKey);
+    _storage.delete(key: _accessTokenKey);
+    _storage.delete(key: _refreshTokenKey);
+    _currentUser = User();
+    _accessToken = "";
+    _refreshToken = "";
+  }
+
   Future<bool> isAuthenticated() async {
-    if ((await getCurrentUser()).id != "") {
+    User currentUser = await getCurrentUser();
+    if (currentUser.id != "") {
       try {
         var accessToken = await getAccessToken();
         if (accessToken != "" &&
-            JwtDecoder.getRemainingTime(accessToken).inMinutes < 2) {
+            JwtDecoder.getRemainingTime(accessToken).inMinutes > 2) {
           try {
             if (_jwtPublicKey != "") {
               throw Exception("empty jwt public  key");
@@ -187,11 +210,14 @@ class UserBlock {
         }
         // token is expired - refresh
         UserRequest req = UserRequest();
+        req.cloudToken = await _authorize.getAccessToken();
         req.token = Token()..refreshToken = await _getRefreshToken();
         UserResponse refreshResp = await _grpcUserClient.refreshToken(req);
         _setAccessToken(refreshResp.token.accessToken);
         _setRefreshToken(refreshResp.token.refreshToken);
+        return true;
       } catch (e) {
+        print("could not refresh token with err" + e.toString());
         return false;
       }
     }
