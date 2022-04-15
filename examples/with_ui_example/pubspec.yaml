@@ -29,7 +29,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  dart_blocks: ^0.0.84
+  dart_blocks: ^0.1.26
 
 
   # The following adds the Cupertino Icons font to your application.

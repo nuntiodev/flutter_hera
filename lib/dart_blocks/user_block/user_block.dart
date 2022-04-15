@@ -25,7 +25,7 @@ class UserBlock {
   // Create storage which is used to store tokens
   late final FlutterSecureStorage _storage;
 
-  // _grpcUserClient is an object to communicate with the mobile_dart_blocks
+  // _grpcUserClient is an object to communicate with the dart_blocks
   late final UserServiceClient _grpcUserClient;
 
   // _encryptionKey is used to encrypt users

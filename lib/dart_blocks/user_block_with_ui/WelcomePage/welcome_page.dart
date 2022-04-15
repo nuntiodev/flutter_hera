@@ -1,6 +1,6 @@
-import 'package:dart_blocks/mobile_dart_blocks/models/auth.dart';
-import 'package:dart_blocks/mobile_dart_blocks/user_block_with_ui/AuthPage/LoginPage/login_page.dart';
-import 'package:dart_blocks/mobile_dart_blocks/user_block_with_ui/AuthPage/RegisterPage/register_page.dart';
+import 'package:dart_blocks/dart_blocks/models/auth.dart';
+import 'package:dart_blocks/dart_blocks/user_block_with_ui/AuthPage/LoginPage/login_page.dart';
+import 'package:dart_blocks/dart_blocks/user_block_with_ui/AuthPage/RegisterPage/register_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -39,6 +39,12 @@ class WelcomePage extends StatelessWidget {
     required this.passwordDoNotMatchDetails,
     required this.invalidTitle,
     required this.invalidDetails,
+    required this.errorColor,
+    required this.successColor,
+    required this.containsEightCharactersText,
+    required this.containsNumberText,
+    required this.passwordMatchText,
+    required this.containsSpecialText,
   });
 
   // general
@@ -82,6 +88,12 @@ class WelcomePage extends StatelessWidget {
   final String passwordRegisterHint;
   final String repeatPasswordRegisterHint;
   final Widget registerTitle;
+  final Widget containsEightCharactersText;
+  final Widget containsNumberText;
+  final Widget passwordMatchText;
+  final Widget containsSpecialText;
+  final Color successColor;
+  final Color errorColor;
 
   AuthEnum auth = AuthEnum.signIn;
 
@@ -95,6 +107,7 @@ class WelcomePage extends StatelessWidget {
     // than having to individually change instances of widgets.
     return CupertinoPageScaffold(
       child: Container(
+        height: MediaQuery.of(context).size.height,
         decoration: background,
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -162,6 +175,8 @@ class WelcomePage extends StatelessWidget {
                           context,
                           CupertinoPageRoute(
                             builder: (context) => RegisterPage(
+                              errorColor: errorColor,
+                              successColor: successColor,
                               validatePassword: validatePassword,
                               textFieldBorder: textFieldBorder,
                               textFieldColor: textFieldColor,
@@ -179,12 +194,18 @@ class WelcomePage extends StatelessWidget {
                               missingPasswordDetails: missingPasswordDetails,
                               invalidDetails: invalidDetails,
                               invalidTitle: invalidTitle,
-                              passwordDoNotMatchDetails: passwordDoNotMatchDetails,
+                              passwordDoNotMatchDetails:
+                                  passwordDoNotMatchDetails,
                               passwordDoNotMatchTitle: passwordDoNotMatchTitle,
-                              onRegister: () => {},
+                              onRegister: onRegister,
                               title: registerTitle,
                               logo: logo,
                               createdBy: createdBy,
+                              containsNumberText: containsNumberText,
+                              passwordMatchText: passwordMatchText,
+                              containsEightCharactersText:
+                                  containsEightCharactersText,
+                              containsSpecialText: containsSpecialText,
                             ),
                           ),
                         );

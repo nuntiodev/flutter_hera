@@ -6,7 +6,7 @@ abstract class Authorize {
 }
 
 class SoftcorpAuthorize implements Authorize {
-  // _grpcProjectClient is an object to communicate with the mobile_dart_blocks
+  // _grpcProjectClient is an object to communicate with the dart_blocks
   late final ProjectServiceClient _grpcProjectClient;
 
   // _apiKey used to authorize requests
