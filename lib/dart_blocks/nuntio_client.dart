@@ -33,6 +33,7 @@ class NuntioClient {
     String? apiUrl,
     String? namespace,
     TransportCredentials? transportCredentials,
+    bool? debug,
   }) async {
     // set values
     _encryptionKey = encryptionKey ?? "";
@@ -69,6 +70,7 @@ class NuntioClient {
       encryptionKey: _encryptionKey,
       jwtPublicKey: jwtPublicKey,
       authorize: authorize,
+      debug: debug,
     );
   }
 }

@@ -15,6 +15,7 @@ class UserBlock {
     required UserServiceClient grpcUserClient,
     required Authorize authorize,
     required String? jwtPublicKey,
+    this.debug,
     String? encryptionKey,
     Function? onLogin,
     Function? onLogout,
@@ -25,6 +26,9 @@ class UserBlock {
     _jwtPublicKey = jwtPublicKey;
     _storage = FlutterSecureStorage();
   }
+
+  // Debug will print error logs if true
+  late final bool? debug;
 
   // Create storage which is used to store tokens
   late final FlutterSecureStorage _storage;
@@ -134,7 +138,7 @@ class UserBlock {
       UserResponse resp = await _grpcUserClient.create(req);
       return resp.user;
     } catch (e) {
-      print("could not create user");
+      if (debug == true) print("could not create user with err: "+e.toString());
       rethrow;
     }
   }
@@ -177,7 +181,7 @@ class UserBlock {
       _setAccessToken(resp.token.accessToken);
       _setRefreshToken(resp.token.refreshToken);
     } catch (e) {
-      print("could not login user");
+      if (debug == true) print("could not login user: "+e.toString());
       rethrow;
     }
   }
@@ -186,21 +190,27 @@ class UserBlock {
     if (await isAuthenticated() == false) {
       throw Exception("user is currently not logged in");
     }
-    // block current access token
-    UserRequest req = UserRequest();
-    req.cloudToken = await getAccessToken();
-    req.tokenPointer = await getAccessToken();
-    _grpcUserClient.blockToken(req);
-    // block current refresh token
-    req.tokenPointer = await _getRefreshToken();
-    _grpcUserClient.blockToken(req);
-    // remove from secure storage
-    _storage.delete(key: _currentUserKey);
-    _storage.delete(key: _accessTokenKey);
-    _storage.delete(key: _refreshTokenKey);
-    _currentUser = User();
-    _accessToken = "";
-    _refreshToken = "";
+    try {
+      //todo: fix UNKNOWN, message: key is of invalid type,
+      // block current access token
+      UserRequest req = UserRequest();
+      req.cloudToken = await _authorize.getAccessToken();
+      req.tokenPointer = await getAccessToken();
+      _grpcUserClient.blockToken(req);
+      // block current refresh token
+      req.tokenPointer = await _getRefreshToken();
+      _grpcUserClient.blockToken(req);
+      // remove from secure storage
+      _storage.delete(key: _currentUserKey);
+      _storage.delete(key: _accessTokenKey);
+      _storage.delete(key: _refreshTokenKey);
+      _currentUser = User();
+      _accessToken = "";
+      _refreshToken = "";
+    } catch(e){
+      if (debug == true) print("could not logout user: "+e.toString());
+      rethrow;
+    }
   }
 
   Future<bool> isAuthenticated() async {
@@ -229,7 +239,7 @@ class UserBlock {
         _setRefreshToken(refreshResp.token.refreshToken);
         return true;
       } catch (e) {
-        print("could not refresh token with err" + e.toString());
+        if (debug == true) print("could not refresh token with err: "+e.toString());
         return false;
       }
     }
@@ -253,7 +263,9 @@ class UserBlock {
           return (await _deviceInfoPlugin.windowsInfo).computerName;
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      if (debug == true) print("could not get device info with err: "+e.toString());
+    }
     return "";
   }
 
@@ -301,6 +313,7 @@ class UserBlock {
           await placemarkFromCoordinates(position.latitude, position.longitude);
       return placemarks.first.country;
     } catch (e) {
+      if (debug == true) print("could not get location with err: "+e.toString());
       return null;
     }
   }
