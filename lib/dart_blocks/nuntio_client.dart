@@ -65,6 +65,7 @@ class NuntioClient {
         await _grpcUserClient.publicKeys(publicKeysReq);
     //todo: find out why this is empty
     String? jwtPublicKey = publicKeysResp.publicKeys["public-jwt-key"];
+    print(publicKeysResp);
     userBlock = UserBlock(
       grpcUserClient: _grpcUserClient,
       encryptionKey: _encryptionKey,

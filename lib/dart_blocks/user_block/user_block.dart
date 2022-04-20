@@ -163,10 +163,9 @@ class UserBlock {
     req.cloudToken = cloudToken;
     req.encryptionKey = _encryptionKey ?? "";
     req.user = user;
-    // set metadata device name for token
+    // set metadata for token
     Token _token = Token();
-    _token.deviceInfo = await _getDeviceInfo();
-    // set metadata device name for location
+    _token.deviceInfo = await _getDeviceInfo() ?? "";
     _token.loggedInFrom = await _determineCountry() ?? "";
     req.token = _token;
     try {
@@ -233,7 +232,12 @@ class UserBlock {
         // token is expired - refresh
         UserRequest req = UserRequest();
         req.cloudToken = await _authorize.getAccessToken();
-        req.token = Token()..refreshToken = await _getRefreshToken();
+        // set metadata for token
+        Token _token = Token();
+        _token.deviceInfo = await _getDeviceInfo() ?? "";
+        _token.loggedInFrom = await _determineCountry() ?? "";
+        _token.refreshToken = await _getRefreshToken();
+        req.token = _token;
         UserResponse refreshResp = await _grpcUserClient.refreshToken(req);
         _setAccessToken(refreshResp.token.accessToken);
         _setRefreshToken(refreshResp.token.refreshToken);
@@ -247,7 +251,7 @@ class UserBlock {
   }
 
   /// Determine the name of the device.
-  Future<String> _getDeviceInfo() async {
+  Future<String?> _getDeviceInfo() async {
     try {
       if (kIsWeb) {
       } else {
@@ -266,7 +270,7 @@ class UserBlock {
     } catch (e) {
       if (debug == true) print("could not get device info with err: "+e.toString());
     }
-    return "";
+    return null;
   }
 
   /// Determine the current position of the device.
