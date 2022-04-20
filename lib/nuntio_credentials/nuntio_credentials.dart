@@ -6,10 +6,10 @@ abstract class TransportCredentials {
   Future<ChannelCredentials> getTransportCredentials();
 }
 
-class SoftcorpCredentials implements TransportCredentials {
+class NuntioCredentials implements TransportCredentials {
   static late Uri _apiUrl;
 
-  SoftcorpCredentials({required apiUrl}) {
+  NuntioCredentials({required apiUrl}) {
     if (apiUrl == "") {
       throw Exception("api url is empty");
     }
@@ -25,7 +25,7 @@ class SoftcorpCredentials implements TransportCredentials {
     RawSecureSocket socket =
         await RawSecureSocket.connect(_apiUrl.host, _apiUrl.port);
     if (socket.peerCertificate == null) {
-      throw Exception("peer certificate is null. Contact info@softcorp.io");
+      throw Exception("peer certificate is null. Contact info@nuntio.io");
     }
     X509Certificate x509certificate = socket.peerCertificate!;
     return ChannelCredentials.secure(

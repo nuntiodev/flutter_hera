@@ -24,11 +24,20 @@
       <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/ios/.symlinks/plugins/flutter_secure_storage/example/build" />
       <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/ios/.symlinks/plugins/flutter_secure_storage/example/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/ios/.symlinks/plugins/flutter_secure_storage/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/ios/.symlinks/plugins/connectivity_plus/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/ios/.symlinks/plugins/connectivity_plus/build" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/ios/.symlinks/plugins/connectivity_plus/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/ios/.symlinks/plugins/connectivity_plus/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/ios/.symlinks/plugins/connectivity_plus/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/ios/.symlinks/plugins/connectivity_plus/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/windows/flutter/ephemeral/.plugin_symlinks/connectivity_plus_windows/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/windows/flutter/ephemeral/.plugin_symlinks/connectivity_plus_windows/build" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/with_ui_example/windows/flutter/ephemeral/.plugin_symlinks/connectivity_plus_windows/.dart_tool" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Dart SDK" level="project" />
-    <orderEntry type="library" name="Dart Packages" level="project" />
     <orderEntry type="library" name="Flutter Plugins" level="project" />
+    <orderEntry type="library" name="Dart Packages" level="project" />
   </component>
 </module>

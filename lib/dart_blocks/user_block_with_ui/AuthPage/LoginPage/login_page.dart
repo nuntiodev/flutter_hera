@@ -1,5 +1,5 @@
 import 'package:dart_blocks/dart_blocks/components/text_field_decoration.dart';
-import 'package:dart_blocks/dart_blocks/softcorp_client.dart';
+import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -172,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                             setState(() {
                               isLoading = true;
                             });
-                            SoftcorpClient.userBlock
+                            NuntioClient.userBlock
                                 .login(
                               password: passwordController.text,
                               email: emailController.text,

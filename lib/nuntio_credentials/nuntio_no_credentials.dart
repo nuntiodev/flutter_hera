@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:dart_blocks/softcorp_credentials/softcorp_credentials.dart';
+import 'package:dart_blocks/nuntio_credentials/nuntio_credentials.dart';
 import "package:grpc/grpc.dart";
 import 'dart:convert';
 
-class SoftcorpNoCredentials implements TransportCredentials {
+class NuntioNoCredentials implements TransportCredentials {
 
   @override
   Future<ChannelCredentials> getTransportCredentials() async {

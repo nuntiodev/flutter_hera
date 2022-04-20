@@ -1,4 +1,4 @@
-import 'package:dart_blocks/dart_blocks/softcorp_client.dart';
+import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -392,7 +392,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             setState(() {
                               isLoading = true;
                             });
-                            SoftcorpClient.userBlock
+                            NuntioClient.userBlock
                                 .create(
                               password: passwordController.text,
                               email: emailController.text,
@@ -427,7 +427,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               return err;
                             }).then((user) {
                               // todo: handle error
-                              SoftcorpClient.userBlock
+                              NuntioClient.userBlock
                                   .login(
                                       password: passwordController.text,
                                       email: emailController.text)

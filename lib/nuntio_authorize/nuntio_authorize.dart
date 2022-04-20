@@ -1,11 +1,11 @@
-import 'package:dart_softcorp_cloud/cloud_project.pbgrpc.dart';
+import 'package:nuntio_cloud/cloud_project.pbgrpc.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 abstract class Authorize {
   Future<String> getAccessToken();
 }
 
-class SoftcorpAuthorize implements Authorize {
+class NuntioAuthorize implements Authorize {
   // _grpcProjectClient is an object to communicate with the dart_blocks
   late final ProjectServiceClient _grpcProjectClient;
 
@@ -15,7 +15,7 @@ class SoftcorpAuthorize implements Authorize {
   // _accessToken is used to connect clients to the api
   String _accessToken = "";
 
-  SoftcorpAuthorize(
+  NuntioAuthorize(
       {required ProjectServiceClient projectClient, required String apiKey}) {
     _grpcProjectClient = projectClient;
     _apiKey = apiKey;

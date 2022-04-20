@@ -106,6 +106,7 @@ class WelcomePage extends StatelessWidget {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return CupertinoPageScaffold(
+      resizeToAvoidBottomInset: false,
       child: Container(
         height: MediaQuery.of(context).size.height,
         decoration: background,

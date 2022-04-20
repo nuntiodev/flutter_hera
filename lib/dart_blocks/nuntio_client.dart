@@ -1,21 +1,21 @@
 import 'package:dart_blocks/dart_blocks/user_block/user_block.dart';
-import 'package:dart_blocks/softcorp_authorize/softcorp_authorize.dart';
-import 'package:dart_blocks/softcorp_credentials/softcorp_credentials.dart';
-import 'package:dart_softcorp_cloud/cloud_project.pbgrpc.dart';
+import 'package:dart_blocks/nuntio_authorize/nuntio_authorize.dart';
+import 'package:dart_blocks/nuntio_credentials/nuntio_credentials.dart';
+import 'package:nuntio_cloud/cloud_project.pbgrpc.dart';
 import 'package:grpc/grpc.dart';
-import 'package:dart_softcorp_blocks/block_user.pbgrpc.dart';
+import 'package:nuntio_blocks/block_user.pbgrpc.dart';
 
-class SoftcorpClient {
+class NuntioClient {
   // _encryptionKey  is used to encrypt clients data under the given key
   static late String _encryptionKey;
 
-  // _apiKey  is used to connect your application to Softcorp Cloud
+  // _apiKey  is used to connect your application to Nuntio Cloud
   static late String _apiKey;
 
   // _apiUrl  is the URL the SDK will try to connect to (only edit this if you know what you are doing)
-  static var _apiUrl = "https://api.softcorp.io:443";
+  static var _apiUrl = "https://api.nuntio.io:443";
 
-  // _namespace defines what namespace you want to use with Softcorp Blocks (only edit this if you know what you are doing)
+  // _namespace defines what namespace you want to use with Nuntio Blocks (only edit this if you know what you are doing)
   static late String _namespace;
 
   // _grpcUserClient is an object to communicate with the dart_blocks
@@ -42,7 +42,7 @@ class SoftcorpClient {
     // build uri
     Uri apiUri = Uri.parse(_apiUrl);
     // build channel
-    transportCredentials ??= SoftcorpCredentials(
+    transportCredentials ??= NuntioCredentials(
       apiUrl: apiUri,
     );
     ChannelCredentials channelCredentials =
@@ -56,7 +56,7 @@ class SoftcorpClient {
     _grpcProjectClient = ProjectServiceClient(apiChannel);
     // build authorize
     Authorize authorize =
-        SoftcorpAuthorize(projectClient: _grpcProjectClient, apiKey: _apiKey);
+        NuntioAuthorize(projectClient: _grpcProjectClient, apiKey: _apiKey);
     // get block user public key
     UserRequest publicKeysReq = UserRequest();
     publicKeysReq.cloudToken = await authorize.getAccessToken();
