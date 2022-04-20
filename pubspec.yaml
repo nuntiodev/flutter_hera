@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  nuntio_blocks: ^0.0.3
+  nuntio_blocks: ^0.0.4
   nuntio_cloud: ^0.0.1
   jwt_decoder: ^2.0.1
   protobuf: ^2.0.1

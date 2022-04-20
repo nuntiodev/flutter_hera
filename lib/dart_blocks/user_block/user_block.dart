@@ -161,10 +161,9 @@ class UserBlock {
     req.user = user;
     // set metadata device name for token
     Token _token = Token();
-    _token .deviceInfo = await _getDeviceInfo();
+    _token.deviceInfo = await _getDeviceInfo();
     // set metadata device name for location
-
-    _token.location = _location;
+    _token.loggedInFrom = await _determineCountry() ?? "";
     req.token = _token;
     try {
       UserResponse resp = await _grpcUserClient.login(req);
@@ -237,7 +236,6 @@ class UserBlock {
     return false;
   }
 
-
   /// Determine the name of the device.
   Future<String> _getDeviceInfo() async {
     try {
@@ -246,7 +244,7 @@ class UserBlock {
         if (Platform.isAndroid) {
           return (await _deviceInfoPlugin.androidInfo).host ?? "";
         } else if (Platform.isIOS) {
-          return  (await _deviceInfoPlugin.iosInfo).name ?? "";
+          return (await _deviceInfoPlugin.iosInfo).name ?? "";
         } else if (Platform.isLinux) {
           return (await _deviceInfoPlugin.linuxInfo).name;
         } else if (Platform.isMacOS) {
@@ -263,7 +261,7 @@ class UserBlock {
   ///
   /// When the location services are not enabled or permissions
   /// are denied the `Future` will return an error.
-  Future<String?> _determinePosition() async {
+  Future<String?> _determineCountry() async {
     try {
       bool serviceEnabled;
       LocationPermission permission;
@@ -299,11 +297,11 @@ class UserBlock {
       // When we reach here, permissions are granted and we can
       // continue accessing the position of the device.
       Position position = await Geolocator.getCurrentPosition();
-      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
       return placemarks.first.country;
-    }catch(e){
+    } catch (e) {
       return null;
     }
   }
-
 }
