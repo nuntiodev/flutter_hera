@@ -1,24 +1,28 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' as WhichPlatform;
 import 'package:dart_blocks/nuntio_authorize/nuntio_authorize.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/foundation.dart';
-import 'package:nuntio_blocks/block_user.pbgrpc.dart';
+import 'package:nuntio_blocks/block_user.pbgrpc.dart' as dart_blocks;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class UserBlock {
   UserBlock({
-    required UserServiceClient grpcUserClient,
+    required dart_blocks.UserServiceClient grpcUserClient,
     required Authorize authorize,
     required String? jwtPublicKey,
     this.debug,
     String? encryptionKey,
     Function? onLogin,
     Function? onLogout,
+    bool? recordActive,
   }) {
     _grpcUserClient = grpcUserClient;
     _authorize = authorize;
@@ -34,7 +38,7 @@ class UserBlock {
   late final FlutterSecureStorage _storage;
 
   // _grpcUserClient is an object to communicate with the dart_blocks
-  late final UserServiceClient _grpcUserClient;
+  late final dart_blocks.UserServiceClient _grpcUserClient;
 
   // _encryptionKey is used to encrypt users
   late final String? _encryptionKey;
@@ -46,7 +50,7 @@ class UserBlock {
   late final Authorize _authorize;
 
   // currentUser is created after user logs in
-  User _currentUser = User();
+  dart_blocks.User _currentUser = dart_blocks.User();
   final String _currentUserKey = "nuntio-blocks-current-user";
 
   // accessToken is used to authenticate user
@@ -57,21 +61,24 @@ class UserBlock {
   String _refreshToken = "";
   final String _refreshTokenKey = "nuntio-blocks-refresh-token";
 
+  // _placemark is used to send data to the backend about user location
+  Placemark? _placemark;
+
   static final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
 
-  Future<User> getCurrentUser() async {
+  Future<dart_blocks.User> getCurrentUser() async {
     if (_currentUser.id != "") {
       return _currentUser;
     }
     var jsonCurrentUser = await _storage.read(key: _currentUserKey);
-    if (jsonCurrentUser != "") {
-      _currentUser = User.fromJson(jsonCurrentUser!);
+    if (jsonCurrentUser != null && jsonCurrentUser != "") {
+      _currentUser = dart_blocks.User.fromJson(jsonCurrentUser);
       return _currentUser;
     }
-    return User();
+    return dart_blocks.User();
   }
 
-  void _setCurrentUser(User currentUser) async {
+  void _setCurrentUser(dart_blocks.User currentUser) async {
     _currentUser = currentUser;
     _storage.write(key: _currentUserKey, value: currentUser.writeToJson());
   }
@@ -110,7 +117,7 @@ class UserBlock {
     _storage.write(key: _refreshTokenKey, value: refreshToken);
   }
 
-  Future<User> create({
+  Future<dart_blocks.User> create({
     String? userId,
     String? optionalId,
     String? email,
@@ -119,8 +126,8 @@ class UserBlock {
     bool? validatePassword,
     dynamic metadata,
   }) async {
-    UserRequest req = UserRequest();
-    User user = User();
+    dart_blocks.UserRequest req = dart_blocks.UserRequest();
+    dart_blocks.User user = dart_blocks.User();
     user.id = userId ?? "";
     user.optionalId = optionalId ?? "";
     user.email = email ?? "";
@@ -135,10 +142,11 @@ class UserBlock {
       user.metadata = encodeMetadata;
     }
     try {
-      UserResponse resp = await _grpcUserClient.create(req);
+      dart_blocks.UserResponse resp = await _grpcUserClient.create(req);
       return resp.user;
     } catch (e) {
-      if (debug == true) print("could not create user with err: "+e.toString());
+      if (debug == true)
+        print("could not create user with err: " + e.toString());
       rethrow;
     }
   }
@@ -154,8 +162,8 @@ class UserBlock {
           "missing one required identifier: userId, optionalId or email");
     }
     String cloudToken = await _authorize.getAccessToken();
-    UserRequest req = UserRequest();
-    User user = User();
+    dart_blocks.UserRequest req = dart_blocks.UserRequest();
+    dart_blocks.User user = dart_blocks.User();
     user.id = userId ?? "";
     user.optionalId = optionalId ?? "";
     user.email = email ?? "";
@@ -164,12 +172,19 @@ class UserBlock {
     req.encryptionKey = _encryptionKey ?? "";
     req.user = user;
     // set metadata for token
-    Token _token = Token();
+    dart_blocks.Token _token = dart_blocks.Token();
     _token.deviceInfo = await _getDeviceInfo() ?? "";
-    _token.loggedInFrom = await _determineCountry() ?? "";
+    var _placemark = await _determinePlacemark();
+    if (_placemark != null) {
+      dart_blocks.Location _location = dart_blocks.Location();
+      _location.country = _placemark.country ?? "";
+      _location.countryCode = _placemark.isoCountryCode ?? "";
+      _location.city = _placemark.locality ?? "";
+      _token.loggedInFrom = _location;
+    }
     req.token = _token;
     try {
-      UserResponse resp = await _grpcUserClient.login(req);
+      dart_blocks.UserResponse resp = await _grpcUserClient.login(req);
       if (resp.token.accessToken == "" || resp.token.refreshToken == "") {
         throw Exception("token is null. Contact info@nuntio.io");
       }
@@ -180,7 +195,7 @@ class UserBlock {
       _setAccessToken(resp.token.accessToken);
       _setRefreshToken(resp.token.refreshToken);
     } catch (e) {
-      if (debug == true) print("could not login user: "+e.toString());
+      if (debug == true) print("could not login user: " + e.toString());
       rethrow;
     }
   }
@@ -190,9 +205,8 @@ class UserBlock {
       throw Exception("user is currently not logged in");
     }
     try {
-      //todo: fix UNKNOWN, message: key is of invalid type,
       // block current access token
-      UserRequest req = UserRequest();
+      dart_blocks.UserRequest req = dart_blocks.UserRequest();
       req.cloudToken = await _authorize.getAccessToken();
       req.tokenPointer = await getAccessToken();
       _grpcUserClient.blockToken(req);
@@ -203,51 +217,89 @@ class UserBlock {
       _storage.delete(key: _currentUserKey);
       _storage.delete(key: _accessTokenKey);
       _storage.delete(key: _refreshTokenKey);
-      _currentUser = User();
+      _currentUser = dart_blocks.User();
       _accessToken = "";
       _refreshToken = "";
-    } catch(e){
-      if (debug == true) print("could not logout user: "+e.toString());
+    } catch (e) {
+      if (debug == true) print("could not logout user: " + e.toString());
       rethrow;
     }
   }
 
   Future<bool> isAuthenticated() async {
-    User currentUser = await getCurrentUser();
+    dart_blocks.User currentUser = await getCurrentUser();
     if (currentUser.id != "") {
       try {
         var accessToken = await getAccessToken();
         if (accessToken != "" &&
             JwtDecoder.getRemainingTime(accessToken).inMinutes > 2) {
           try {
-            if (_jwtPublicKey != "") {
-              throw Exception("empty jwt public  key");
+            if (_jwtPublicKey == "") {
+              throw Exception("empty jwt public key");
             }
-            JWT.verify(accessToken, SecretKey(_jwtPublicKey!));
+            JWT.verify(accessToken, RSAPublicKey(_jwtPublicKey ?? ""));
             return true;
           } catch (e) {
-            print("could not verify token with err" + e.toString());
+            if (debug == true)
+              print("could not verify token with err" + e.toString());
           }
         }
         // token is expired - refresh
-        UserRequest req = UserRequest();
+        dart_blocks.UserRequest req = dart_blocks.UserRequest();
         req.cloudToken = await _authorize.getAccessToken();
         // set metadata for token
-        Token _token = Token();
+        dart_blocks.Token _token = dart_blocks.Token();
         _token.deviceInfo = await _getDeviceInfo() ?? "";
-        _token.loggedInFrom = await _determineCountry() ?? "";
+        Placemark? _placemark = this._placemark ?? await _determinePlacemark();
+        if (_placemark != null) {
+          dart_blocks.Location _location = dart_blocks.Location();
+          _location.country = _placemark.country ?? "";
+          _location.countryCode = _placemark.isoCountryCode ?? "";
+          _location.city = _placemark.locality ?? "";
+          _token.loggedInFrom = _location;
+        }
         _token.refreshToken = await _getRefreshToken();
         req.token = _token;
-        UserResponse refreshResp = await _grpcUserClient.refreshToken(req);
+        dart_blocks.UserResponse refreshResp =
+            await _grpcUserClient.refreshToken(req);
         _setAccessToken(refreshResp.token.accessToken);
         _setRefreshToken(refreshResp.token.refreshToken);
         return true;
       } catch (e) {
-        if (debug == true) print("could not refresh token with err: "+e.toString());
+        if (debug == true)
+          print("could not refresh token with err: " + e.toString());
         return false;
       }
     }
     return false;
+  }
+
+  Future<void> recordActiveMeasurement(
+      int seconds, String activeId, String userId) async {
+    if (seconds > 0 && activeId != "" && userId != "") {
+      dart_blocks.UserRequest req = dart_blocks.UserRequest();
+      dart_blocks.ActiveMeasurement _activeMeasurement =
+          dart_blocks.ActiveMeasurement();
+      _activeMeasurement.seconds = seconds;
+      _activeMeasurement.id = activeId;
+      _activeMeasurement.userId = userId;
+      dart_blocks.Location _location = dart_blocks.Location();
+      if (_placemark != null || await _determinePlacemark() != null) {
+        _location.countryCode = _placemark!.isoCountryCode ?? "";
+        _location.country = _placemark!.country ?? "";
+        _location.city = _placemark!.locality ?? "";
+        _activeMeasurement.from = _location;
+      }
+      req.activeMeasurement = _activeMeasurement;
+      req.cloudToken = await _authorize.getAccessToken();
+      if (debug == true) {
+        print("sending previous user session with activeness: " +
+            (seconds.toString()).toString() +
+            "s");
+      }
+      await _grpcUserClient.recordActiveMeasurement(req);
+      return;
+    }
   }
 
   /// Determine the name of the device.
@@ -255,20 +307,21 @@ class UserBlock {
     try {
       if (kIsWeb) {
       } else {
-        if (Platform.isAndroid) {
+        if (WhichPlatform.Platform.isAndroid) {
           return (await _deviceInfoPlugin.androidInfo).host ?? "";
-        } else if (Platform.isIOS) {
+        } else if (WhichPlatform.Platform.isIOS) {
           return (await _deviceInfoPlugin.iosInfo).name ?? "";
-        } else if (Platform.isLinux) {
+        } else if (WhichPlatform.Platform.isLinux) {
           return (await _deviceInfoPlugin.linuxInfo).name;
-        } else if (Platform.isMacOS) {
+        } else if (WhichPlatform.Platform.isMacOS) {
           return (await _deviceInfoPlugin.macOsInfo).computerName;
-        } else if (Platform.isWindows) {
+        } else if (WhichPlatform.Platform.isWindows) {
           return (await _deviceInfoPlugin.windowsInfo).computerName;
         }
       }
     } catch (e) {
-      if (debug == true) print("could not get device info with err: "+e.toString());
+      if (debug == true)
+        print("could not get device info with err: " + e.toString());
     }
     return null;
   }
@@ -277,7 +330,7 @@ class UserBlock {
   ///
   /// When the location services are not enabled or permissions
   /// are denied the `Future` will return an error.
-  Future<String?> _determineCountry() async {
+  Future<Placemark?> _determinePlacemark() async {
     try {
       bool serviceEnabled;
       LocationPermission permission;
@@ -315,9 +368,11 @@ class UserBlock {
       Position position = await Geolocator.getCurrentPosition();
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
-      return placemarks.first.country;
+      _placemark = placemarks.first;
+      return placemarks.first;
     } catch (e) {
-      if (debug == true) print("could not get location with err: "+e.toString());
+      if (debug == true)
+        print("could not get location with err: " + e.toString());
       return null;
     }
   }

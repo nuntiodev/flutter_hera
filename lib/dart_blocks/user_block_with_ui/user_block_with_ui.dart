@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dart_blocks/dart_blocks/models/auth.dart';
 import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:dart_blocks/dart_blocks/user_block_with_ui/NoConnection/no_connection.dart';
@@ -5,6 +7,9 @@ import 'package:dart_blocks/dart_blocks/user_block_with_ui/WelcomePage/welcome_p
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:nuntio_blocks/block_user.pb.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class UserBlockWithUI extends StatefulWidget {
   UserBlockWithUI({
@@ -50,6 +55,9 @@ class UserBlockWithUI extends StatefulWidget {
     this.containsSpecialText,
     this.noConnectionTitle,
     this.noConnectionDetails,
+    this.forgotPasswordText,
+    this.buttonHeight,
+    this.buttonWidth,
   }) : super(key: key);
 
   // general
@@ -61,6 +69,8 @@ class UserBlockWithUI extends StatefulWidget {
   final BoxDecoration? background;
   final Border? textFieldBorder;
   final Color? textFieldColor;
+  final double? buttonHeight;
+  final double? buttonWidth;
 
   // error messages
   final String? missingEmailTitle;
@@ -87,6 +97,7 @@ class UserBlockWithUI extends StatefulWidget {
   final String? emailLoginHint;
   final String? passwordLoginHint;
   final Widget? loginTitle;
+  final Widget? forgotPasswordText;
 
   // register
   final bool? disableRegistration;
@@ -110,13 +121,22 @@ class UserBlockWithUI extends StatefulWidget {
   State<UserBlockWithUI> createState() => _UserBlockWithUIState();
 }
 
-class _UserBlockWithUIState extends State<UserBlockWithUI> {
+class _UserBlockWithUIState extends State<UserBlockWithUI>
+    with WidgetsBindingObserver {
   // todo: use Extended() to make better use of space
 
   // init
   late Future<AuthState> isAuthenticatedFuture;
+  late Timer? _timer;
+  final String _activeKeySeconds = "nuntio-blocks-active-seconds";
+  final String _activeKeyId = "nuntio-blocks-active-id";
+  final String _activeKeyUserId = "nuntio-blocks-active-user-id";
+
+  // _activeId is used to record how long user is active
+  String _activeId = "";
 
   Future<AuthState> getIsAuthenticated() async {
+    final _prefs = await SharedPreferences.getInstance();
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
       //  no data connection
@@ -129,14 +149,68 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
     return AuthState.notAuthenticated;
   }
 
+  void _measureUserTime() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    // init new values
+    const int _interval = 2;
+    int _current = 0;
+    _activeId = Uuid().v4();
+    // every 1 seconds record time time. Send average of these every 5 minute to server.
+    _timer = Timer.periodic(Duration(seconds: _interval), (timer) async {
+      User _currentUser = await NuntioClient.userBlock.getCurrentUser();
+      if (_currentUser.id != "" && _activeId != "") {
+        if ((_prefs.getString(_activeKeyUserId) ?? "") == "") {
+          await _prefs.setString(_activeKeyUserId, _currentUser.id);
+          await _prefs.setString(_activeKeyId, _activeId);
+        }
+        _current += _interval;
+        await _prefs.setInt(_activeKeySeconds, _current);
+      }
+    });
+  }
+
   _UserBlockWithUIState() {
     isAuthenticatedFuture = getIsAuthenticated();
   }
 
-  // todo: implement no wifi connection
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addObserver(this);
+    _measureUserTime();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.paused) {
+      SharedPreferences _prefs = await SharedPreferences.getInstance();
+      // check if previous session has id
+      final _prevTotalSeconds = _prefs.getInt(_activeKeySeconds) ?? 0;
+      final _prevActiveId = _prefs.getString(_activeKeyId) ?? "";
+      final _prevActiveUserId = _prefs.getString(_activeKeyUserId) ?? "";
+      await NuntioClient.userBlock.recordActiveMeasurement(
+          _prevTotalSeconds, _prevActiveId, _prevActiveUserId);
+      await _prefs.remove(_activeKeySeconds);
+      await _prefs.remove(_activeKeyId);
+      await _prefs.remove(_activeKeyUserId);
+      if(_timer != null){
+        _timer?.cancel();
+      }
+    } else if (state == AppLifecycleState.resumed) {
+      _measureUserTime();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      backgroundColor: Colors.white,
       child: FutureBuilder<AuthState>(
           future: isAuthenticatedFuture,
           builder: (BuildContext context, AsyncSnapshot<AuthState> snapshot) {
@@ -151,6 +225,8 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                 } else if (snapshot.data == null ||
                     snapshot.data == AuthState.notAuthenticated) {
                   return WelcomePage(
+                    buttonHeight: widget.buttonHeight ?? 50,
+                    buttonWidth: widget.buttonWidth ?? 250,
                     disableRegistration: widget.disableRegistration ?? false,
                     validatePassword: widget.validatePassword ?? true,
                     textFieldColor: widget.textFieldColor ?? Colors.white,
@@ -158,6 +234,13 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                         Border.all(
                           color: Colors.black26,
                           width: 0.5,
+                        ),
+                    forgotPasswordText: widget.forgotPasswordText ??
+                        Text(
+                          "Forgot your password?",
+                          style: TextStyle(
+                            color: widget.primaryColor,
+                          ),
                         ),
                     logo: widget.logo ??
                         Padding(
@@ -315,6 +398,7 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                         ),
                   );
                 } else {
+                  print(snapshot.data);
                   return NoConnection(
                     createdBy: widget.createdBy ??
                         Text(
@@ -333,7 +417,7 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                               ?.copyWith(color: Colors.black),
                           textAlign: TextAlign.center,
                         ),
-                    details: widget.noConnectionTitle ??
+                    details: widget.noConnectionDetails ??
                         Text(
                           "We cannot authenticate you without a connection",
                           style: Theme.of(context)

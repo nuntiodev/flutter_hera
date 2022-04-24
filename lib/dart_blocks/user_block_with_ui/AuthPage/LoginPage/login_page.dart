@@ -25,6 +25,9 @@ class LoginPage extends StatefulWidget {
     required this.missingPasswordDetails,
     required this.invalidTitle,
     required this.invalidDetails,
+    required this.forgotPasswordText,
+    required this.buttonHeight,
+    required this.buttonWidth,
   }) : super(key: key);
 
   final Widget loginButtonText;
@@ -40,6 +43,9 @@ class LoginPage extends StatefulWidget {
   final Function onLogin;
   final Border textFieldBorder;
   final Color textFieldColor;
+  final Widget forgotPasswordText;
+  final double buttonHeight;
+  final double buttonWidth;
 
   final String missingEmailTitle;
   final String missingEmailDetails;
@@ -121,7 +127,8 @@ class _LoginPageState extends State<LoginPage> {
                         height: 30,
                       ),
                       SizedBox(
-                        width: 250,
+                        width: widget.buttonWidth,
+                        height: widget.buttonHeight,
                         child: CupertinoButton(
                           color: widget.primaryColor,
                           onPressed: () {
@@ -220,12 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                         height: 10,
                       ),
                       CupertinoButton(
-                        child: Text(
-                          "Forgot your password?",
-                          style: TextStyle(
-                            color: widget.secondaryColor,
-                          ),
-                        ),
+                        child: widget.forgotPasswordText,
                         onPressed: () {},
                       ),
                     ],

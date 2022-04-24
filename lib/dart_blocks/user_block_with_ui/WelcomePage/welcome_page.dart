@@ -45,6 +45,9 @@ class WelcomePage extends StatelessWidget {
     required this.containsNumberText,
     required this.passwordMatchText,
     required this.containsSpecialText,
+    required this.forgotPasswordText,
+    required this.buttonHeight,
+    required this.buttonWidth,
   });
 
   // general
@@ -55,6 +58,8 @@ class WelcomePage extends StatelessWidget {
   final Border textFieldBorder;
   final Color textFieldColor;
   final Widget logo;
+  final double buttonHeight;
+  final double buttonWidth;
 
   // error messages
   final String missingEmailTitle;
@@ -77,6 +82,7 @@ class WelcomePage extends StatelessWidget {
   final Function onLogin;
   final String emailLoginHint;
   final String passwordLoginHint;
+  final Widget forgotPasswordText;
 
   // register
   final bool disableRegistration;
@@ -129,7 +135,8 @@ class WelcomePage extends StatelessWidget {
                 welcomeDetails,
                 const Spacer(),
                 SizedBox(
-                  width: 250,
+                  width: buttonWidth,
+                  height: buttonHeight,
                   child: CupertinoButton(
                     color: primaryColor,
                     onPressed: () {
@@ -137,7 +144,10 @@ class WelcomePage extends StatelessWidget {
                         context,
                         CupertinoPageRoute(
                           builder: (context) => LoginPage(
+                            buttonWidth: buttonWidth,
+                            buttonHeight: buttonHeight,
                             textFieldBorder: textFieldBorder,
+                            forgotPasswordText: forgotPasswordText,
                             textFieldColor: textFieldColor,
                             emailHint: emailLoginHint,
                             createdBy: createdBy,
@@ -163,12 +173,13 @@ class WelcomePage extends StatelessWidget {
                     child: loginButtonText,
                   ),
                 ),
-                const SizedBox(
+                SizedBox(
                   height: 20,
                 ),
                 if (!disableRegistration)
                   SizedBox(
-                    width: 250,
+                    width: buttonWidth,
+                    height: buttonHeight,
                     child: CupertinoButton(
                       color: secondaryColor,
                       onPressed: () {
@@ -176,6 +187,8 @@ class WelcomePage extends StatelessWidget {
                           context,
                           CupertinoPageRoute(
                             builder: (context) => RegisterPage(
+                              buttonWidth: buttonWidth,
+                              buttonHeight: buttonHeight,
                               errorColor: errorColor,
                               successColor: successColor,
                               validatePassword: validatePassword,

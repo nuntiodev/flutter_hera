@@ -36,8 +36,12 @@ class RegisterPage extends StatefulWidget {
     required this.containsNumberText,
     required this.containsSpecialText,
     required this.passwordMatchText,
+    required this.buttonHeight,
+    required this.buttonWidth,
   }) : super(key: key);
 
+  final double buttonHeight;
+  final double buttonWidth;
   final bool validatePassword;
   final Widget buttonText;
   final BoxDecoration background;
@@ -322,7 +326,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         height: 30,
                       ),
                       SizedBox(
-                        width: 250,
+                        width: widget.buttonWidth,
+                        height: widget.buttonHeight,
                         child: CupertinoButton(
                           color: widget.secondaryColor,
                           onPressed: () {

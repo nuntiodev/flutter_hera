@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dart_blocks/dart_blocks/user_block/user_block.dart';
 import 'package:dart_blocks/nuntio_authorize/nuntio_authorize.dart';
 import 'package:dart_blocks/nuntio_credentials/nuntio_credentials.dart';
@@ -34,6 +36,7 @@ class NuntioClient {
     String? namespace,
     TransportCredentials? transportCredentials,
     bool? debug,
+    bool? recordActive,
   }) async {
     // set values
     _encryptionKey = encryptionKey ?? "";
@@ -65,13 +68,13 @@ class NuntioClient {
         await _grpcUserClient.publicKeys(publicKeysReq);
     //todo: find out why this is empty
     String? jwtPublicKey = publicKeysResp.publicKeys["public-jwt-key"];
-    print(publicKeysResp);
     userBlock = UserBlock(
       grpcUserClient: _grpcUserClient,
       encryptionKey: _encryptionKey,
       jwtPublicKey: jwtPublicKey,
       authorize: authorize,
       debug: debug,
+      recordActive: recordActive,
     );
   }
 }
