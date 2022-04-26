@@ -214,9 +214,8 @@ class UserBlock {
       req.tokenPointer = await _getRefreshToken();
       _grpcUserClient.blockToken(req);
       // remove from secure storage
-      _storage.delete(key: _currentUserKey);
-      _storage.delete(key: _accessTokenKey);
-      _storage.delete(key: _refreshTokenKey);
+      _storage.deleteAll();
+      (await SharedPreferences.getInstance()).clear();
       _currentUser = dart_blocks.User();
       _accessToken = "";
       _refreshToken = "";

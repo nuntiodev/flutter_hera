@@ -131,12 +131,13 @@ class _UserBlockWithUIState extends State<UserBlockWithUI>
   final String _activeKeySeconds = "nuntio-blocks-active-seconds";
   final String _activeKeyId = "nuntio-blocks-active-id";
   final String _activeKeyUserId = "nuntio-blocks-active-user-id";
+  late final SharedPreferences? _prefs;
 
   // _activeId is used to record how long user is active
   String _activeId = "";
 
-  Future<AuthState> getIsAuthenticated() async {
-    final _prefs = await SharedPreferences.getInstance();
+  Future<AuthState> initializeNuntioUI() async {
+    _prefs = await SharedPreferences.getInstance();
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
       //  no data connection
@@ -149,28 +150,43 @@ class _UserBlockWithUIState extends State<UserBlockWithUI>
     return AuthState.notAuthenticated;
   }
 
-  void _measureUserTime() async {
-    SharedPreferences _prefs = await SharedPreferences.getInstance();
+  Future<void> _measureUserTime() async {
+    try {
+      if (_timer != null) {
+        _timer!.cancel();
+      }
+      if(_prefs != null){
+        await _prefs!.remove(_activeId);
+        await _prefs!.remove(_activeKeyUserId);
+        await _prefs!.remove(_activeKeyId);
+      }
+    }catch(e){
+      print(e);
+    }
     // init new values
     const int _interval = 2;
     int _current = 0;
     _activeId = Uuid().v4();
     // every 1 seconds record time time. Send average of these every 5 minute to server.
     _timer = Timer.periodic(Duration(seconds: _interval), (timer) async {
-      User _currentUser = await NuntioClient.userBlock.getCurrentUser();
-      if (_currentUser.id != "" && _activeId != "") {
-        if ((_prefs.getString(_activeKeyUserId) ?? "") == "") {
-          await _prefs.setString(_activeKeyUserId, _currentUser.id);
-          await _prefs.setString(_activeKeyId, _activeId);
+      // make sure shared prefs is available
+      if (_prefs != null) {
+        print("adding number");
+        User _currentUser = await NuntioClient.userBlock.getCurrentUser();
+        if (_currentUser.id != "" && _activeId != "") {
+          if ((_prefs!.getString(_activeKeyUserId) ?? "") == "") {
+            await _prefs!.setString(_activeKeyUserId, _currentUser.id);
+            await _prefs!.setString(_activeKeyId, _activeId);
+          }
+          _current += _interval;
+          await _prefs!.setInt(_activeKeySeconds, _current);
         }
-        _current += _interval;
-        await _prefs.setInt(_activeKeySeconds, _current);
       }
     });
   }
 
   _UserBlockWithUIState() {
-    isAuthenticatedFuture = getIsAuthenticated();
+    isAuthenticatedFuture = initializeNuntioUI();
   }
 
   @override
@@ -189,21 +205,27 @@ class _UserBlockWithUIState extends State<UserBlockWithUI>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.paused) {
-      SharedPreferences _prefs = await SharedPreferences.getInstance();
       // check if previous session has id
-      final _prevTotalSeconds = _prefs.getInt(_activeKeySeconds) ?? 0;
-      final _prevActiveId = _prefs.getString(_activeKeyId) ?? "";
-      final _prevActiveUserId = _prefs.getString(_activeKeyUserId) ?? "";
-      await NuntioClient.userBlock.recordActiveMeasurement(
-          _prevTotalSeconds, _prevActiveId, _prevActiveUserId);
-      await _prefs.remove(_activeKeySeconds);
-      await _prefs.remove(_activeKeyId);
-      await _prefs.remove(_activeKeyUserId);
-      if(_timer != null){
-        _timer?.cancel();
+      if (_prefs != null) {
+        try {
+          final _prevTotalSeconds = _prefs!.getInt(_activeKeySeconds) ?? 0;
+          final _prevActiveId = _prefs!.getString(_activeKeyId) ?? "";
+          final _prevActiveUserId = _prefs!.getString(_activeKeyUserId) ?? "";
+          if (_prevTotalSeconds > 0 &&
+              _prevActiveId != "" &&
+              _prevActiveUserId != "") {
+            await NuntioClient.userBlock.recordActiveMeasurement(
+                _prevTotalSeconds, _prevActiveId, _prevActiveUserId);
+          }
+        } catch (e) {
+          print(e);
+        }
+        if(_timer != null){
+          _timer!.cancel();
+        }
       }
     } else if (state == AppLifecycleState.resumed) {
-      _measureUserTime();
+      await _measureUserTime();
     }
   }
 
@@ -300,7 +322,7 @@ class _UserBlockWithUIState extends State<UserBlockWithUI>
                       if (widget.onLogin != null) {widget.onLogin!()},
                       setState(() {
                         isAuthenticatedFuture =
-                            getIsAuthenticated().then((isAuthenticated) {
+                            initializeNuntioUI().then((isAuthenticated) {
                           if (isAuthenticated == AuthState.authenticated) {
                             Navigator.pop(context);
                           }
@@ -325,7 +347,7 @@ class _UserBlockWithUIState extends State<UserBlockWithUI>
                       if (widget.onRegister != null) {widget.onRegister!()},
                       setState(() {
                         isAuthenticatedFuture =
-                            getIsAuthenticated().then((isAuthenticated) {
+                            initializeNuntioUI().then((isAuthenticated) {
                           if (isAuthenticated == AuthState.authenticated) {
                             Navigator.pop(context);
                           }
