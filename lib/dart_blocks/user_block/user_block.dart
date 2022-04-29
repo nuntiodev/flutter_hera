@@ -301,6 +301,12 @@ class UserBlock {
     }
   }
 
+  Future<dart_blocks.Config> getConfiguration() async {
+    dart_blocks.UserRequest req = dart_blocks.UserRequest();
+    req.cloudToken = await _authorize.getAccessToken();
+    return (await _grpcUserClient.getConfig(req)).config;
+  }
+
   /// Determine the name of the device.
   Future<String?> _getDeviceInfo() async {
     try {
