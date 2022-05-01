@@ -38,6 +38,7 @@ class RegisterPage extends StatefulWidget {
     required this.passwordMatchText,
     required this.buttonHeight,
     required this.buttonWidth,
+    required this.arrowBackColor,
   }) : super(key: key);
 
   final double buttonHeight;
@@ -71,7 +72,7 @@ class RegisterPage extends StatefulWidget {
   final Widget containsSpecialText;
   final Widget containsNumberText;
   final Widget passwordMatchText;
-
+  final Color arrowBackColor;
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
@@ -163,7 +164,7 @@ class _RegisterPageState extends State<RegisterPage> {
         leading: CupertinoButton(
           child: Icon(
             Icons.arrow_back_ios,
-            color: widget.primaryColor,
+            color: widget.arrowBackColor,
           ),
           onPressed: () => Navigator.pop(context),
         ),

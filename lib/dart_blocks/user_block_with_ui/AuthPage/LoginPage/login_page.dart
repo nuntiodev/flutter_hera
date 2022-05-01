@@ -28,12 +28,14 @@ class LoginPage extends StatefulWidget {
     required this.forgotPasswordText,
     required this.buttonHeight,
     required this.buttonWidth,
+    required this.arrowBackColor,
   }) : super(key: key);
 
   final Widget loginButtonText;
   final BoxDecoration background;
   final Color primaryColor;
   final Color secondaryColor;
+  final Color arrowBackColor;
   final String emailHint;
   final String passwordHint;
   final Widget details;
@@ -73,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
         leading: CupertinoButton(
           child: Icon(
             Icons.arrow_back_ios,
-            color: widget.primaryColor,
+            color: widget.arrowBackColor,
           ),
           onPressed: () => Navigator.pop(context),
         ),

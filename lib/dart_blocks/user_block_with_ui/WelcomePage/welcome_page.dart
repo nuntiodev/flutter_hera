@@ -48,6 +48,11 @@ class WelcomePage extends StatelessWidget {
     required this.forgotPasswordText,
     required this.buttonHeight,
     required this.buttonWidth,
+    required this.infoColor,
+    required this.disableLogin,
+    required this.disableConnect,
+    required this.arrowBackColor,
+    required this.forgotPasswordColor,
   });
 
   // general
@@ -60,6 +65,12 @@ class WelcomePage extends StatelessWidget {
   final Widget logo;
   final double buttonHeight;
   final double buttonWidth;
+  final Color infoColor;
+  final Color arrowBackColor;
+  final Color forgotPasswordColor;
+
+  // connect
+  final bool disableConnect;
 
   // error messages
   final String missingEmailTitle;
@@ -76,6 +87,7 @@ class WelcomePage extends StatelessWidget {
   final Widget welcomeDetails;
 
   // login
+  final bool disableLogin;
   final Widget loginButtonText;
   final Widget loginDetailsTitle;
   final Widget loginTitle;
@@ -113,6 +125,17 @@ class WelcomePage extends StatelessWidget {
     // than having to individually change instances of widgets.
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: false,
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: Colors.transparent,
+        trailing: CupertinoButton(
+          child: Icon(
+            Icons.info_outline,
+            color: infoColor,
+          ),
+          onPressed: () => print("info about org goes here"),
+        ),
+        border: null,
+      ),
       child: Container(
         height: MediaQuery.of(context).size.height,
         decoration: background,
@@ -134,48 +157,94 @@ class WelcomePage extends StatelessWidget {
                 ),
                 welcomeDetails,
                 const Spacer(),
-                SizedBox(
-                  width: buttonWidth,
-                  height: buttonHeight,
-                  child: CupertinoButton(
-                    color: primaryColor,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (context) => LoginPage(
-                            buttonWidth: buttonWidth,
-                            buttonHeight: buttonHeight,
-                            textFieldBorder: textFieldBorder,
-                            forgotPasswordText: forgotPasswordText,
-                            textFieldColor: textFieldColor,
-                            emailHint: emailLoginHint,
-                            createdBy: createdBy,
-                            background: background,
-                            primaryColor: primaryColor,
-                            secondaryColor: secondaryColor,
-                            title: loginTitle,
-                            logo: logo,
-                            passwordHint: passwordLoginHint,
-                            onLogin: onLogin,
-                            details: loginDetailsTitle,
-                            loginButtonText: loginButtonText,
-                            missingPasswordTitle: missingPasswordTitle,
-                            missingEmailDetails: missingEmailDetails,
-                            missingEmailTitle: missingEmailTitle,
-                            missingPasswordDetails: missingPasswordDetails,
-                            invalidDetails: invalidDetails,
-                            invalidTitle: invalidTitle,
+                if (!disableConnect)
+                  SizedBox(
+                    width: buttonWidth,
+                    height: buttonHeight,
+                    child: CupertinoButton(
+                      color: MediaQuery.of(context).platformBrightness ==
+                              Brightness.light
+                          ? Colors.black.withOpacity(0.95)
+                          : Colors.white.withOpacity(0.95),
+                      padding: EdgeInsets.all(5),
+                      alignment: Alignment.center,
+                      onPressed: () {},
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.network(
+                            "https://nuntiodev.github.io/website/nuntio/nuntio_white.png",
+                            width: 22,
                           ),
-                        ),
-                      );
-                    },
-                    child: loginButtonText,
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "Continue with Nuntio",
+                            textAlign: TextAlign.center,
+                            style: MediaQuery.of(context).platformBrightness ==
+                                    Brightness.light
+                                ? TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500)
+                                : TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
+                if (!disableConnect)
+                  SizedBox(
+                    height: 15,
+                  ),
+                if (!disableLogin)
+                  SizedBox(
+                    width: buttonWidth,
+                    height: buttonHeight,
+                    child: CupertinoButton(
+                      color: primaryColor,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => LoginPage(
+                              arrowBackColor: arrowBackColor,
+                              buttonWidth: buttonWidth,
+                              buttonHeight: buttonHeight,
+                              textFieldBorder: textFieldBorder,
+                              forgotPasswordText: forgotPasswordText,
+                              textFieldColor: textFieldColor,
+                              emailHint: emailLoginHint,
+                              createdBy: createdBy,
+                              background: background,
+                              primaryColor: primaryColor,
+                              secondaryColor: secondaryColor,
+                              title: loginTitle,
+                              logo: logo,
+                              passwordHint: passwordLoginHint,
+                              onLogin: onLogin,
+                              details: loginDetailsTitle,
+                              loginButtonText: loginButtonText,
+                              missingPasswordTitle: missingPasswordTitle,
+                              missingEmailDetails: missingEmailDetails,
+                              missingEmailTitle: missingEmailTitle,
+                              missingPasswordDetails: missingPasswordDetails,
+                              invalidDetails: invalidDetails,
+                              invalidTitle: invalidTitle,
+                            ),
+                          ),
+                        );
+                      },
+                      child: loginButtonText,
+                    ),
+                  ),
+                if (!disableLogin)
+                  SizedBox(
+                    height: 15,
+                  ),
                 if (!disableRegistration)
                   SizedBox(
                     width: buttonWidth,
@@ -190,6 +259,7 @@ class WelcomePage extends StatelessWidget {
                               buttonWidth: buttonWidth,
                               buttonHeight: buttonHeight,
                               errorColor: errorColor,
+                              arrowBackColor: arrowBackColor,
                               successColor: successColor,
                               validatePassword: validatePassword,
                               textFieldBorder: textFieldBorder,

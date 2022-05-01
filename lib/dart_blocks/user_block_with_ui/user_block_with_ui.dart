@@ -25,6 +25,15 @@ class UserBlockWithUI extends StatefulWidget {
     this.successColor,
     this.buttonHeight,
     this.buttonWidth,
+    this.titleStyle,
+    this.detailsStyle,
+    this.createdByStyle,
+    this.loginButtonTextStyle,
+    this.registerButtonTextStyle,
+    this.bodyTextStyle,
+    this.infoColor,
+    this.arrowBackColor,
+    this.forgotPasswordColor,
   }) : super(key: key);
 
   // general
@@ -37,6 +46,9 @@ class UserBlockWithUI extends StatefulWidget {
   final Color? successColor;
   final Color? errorColor;
   final Color? textFieldColor;
+  final Color? infoColor;
+  final Color? arrowBackColor;
+  final Color? forgotPasswordColor;
 
   // sizes
   final double? buttonHeight;
@@ -50,6 +62,13 @@ class UserBlockWithUI extends StatefulWidget {
   final Function? onRegister;
   final Function? onLogin;
 
+  // style
+  final TextStyle? detailsStyle;
+  final TextStyle? titleStyle;
+  final TextStyle? createdByStyle;
+  final TextStyle? loginButtonTextStyle;
+  final TextStyle? registerButtonTextStyle;
+  final TextStyle? bodyTextStyle;
 
   // on authenticated go to child;
   @override
@@ -79,7 +98,6 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
     initializeNuntioUIFuture = initializeNuntioUI();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return UserAnalytics(
@@ -99,8 +117,13 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                   } else if (snapshot.data == null ||
                       snapshot.data == AuthState.notAuthenticated) {
                     return WelcomePage(
-                      buttonHeight: widget.buttonHeight ?? 50,
-                      buttonWidth: widget.buttonWidth ?? 250,
+                      arrowBackColor: widget.arrowBackColor ?? Colors.black,
+                      forgotPasswordColor: widget.forgotPasswordColor ?? Colors.black,
+                      disableConnect: !_config.enableNuntioConnect,
+                      disableLogin: _config.disableDefaultLogin,
+                      infoColor: widget.infoColor ?? Colors.black,
+                      buttonHeight: widget.buttonHeight ?? 55,
+                      buttonWidth: widget.buttonWidth ?? 280,
                       disableRegistration: _config.disableDefaultSignup,
                       validatePassword: _config.validatePassword,
                       textFieldColor: widget.textFieldColor ?? Colors.white,
@@ -111,19 +134,22 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                           ),
                       forgotPasswordText: Text(
                         _config.loginText.forgotPassword,
-                            style: TextStyle(
-                              color: widget.primaryColor,
-                            ),
-                          ),
+                        style: TextStyle(
+                          color: widget.forgotPasswordColor ?? Colors.black,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                       logo: widget.logo ??
                           Padding(
                             padding: EdgeInsets.only(top: 20, bottom: 30),
                             child: Text(
                               "Move fast. Stay in control.",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(color: Colors.black),
+                              style: widget.titleStyle ??
+                                  Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.copyWith(color: Colors.black),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                       background: widget.background ??
@@ -132,39 +158,51 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                       secondaryColor:
                           widget.secondaryColor ?? Color(0xff2862FF),
                       welcomeDetails: Text(
-                            _config.welcomeText.welcomeDetails,
-                            style: Theme.of(context)
+                        _config.welcomeText.welcomeDetails,
+                        style: widget.detailsStyle ??
+                            Theme.of(context)
                                 .textTheme
                                 .titleMedium
                                 ?.copyWith(color: Colors.black),
-                            textAlign: TextAlign.center,
-                          ),
-                      createdBy:Text(
-                            _config.generalText.createdBy,
-                            style: Theme.of(context)
+                        textAlign: TextAlign.center,
+                      ),
+                      createdBy: Text(
+                        _config.generalText.createdBy,
+                        style: widget.createdByStyle ??
+                            Theme.of(context)
                                 .textTheme
                                 .titleSmall
                                 ?.copyWith(color: Colors.black),
-                          ),
-                      welcomeTitle:Text(
-                            _config.welcomeText.welcomeTitle,
-                            style: Theme.of(context)
+                        textAlign: TextAlign.center,
+                      ),
+                      welcomeTitle: Text(
+                        _config.welcomeText.welcomeTitle,
+                        style: widget.titleStyle ??
+                            Theme.of(context)
                                 .textTheme
                                 .titleLarge
                                 ?.copyWith(color: Colors.black),
-                          ),
-                      loginButtonText: Text(_config.loginText.loginButton),
-                      registerButtonText:Text(
-                            _config.registerText.registerButton,
-                          ),
-                      loginDetailsTitle:Text(
-                            _config.loginText.loginDetails,
-                            style: Theme.of(context)
+                        textAlign: TextAlign.center,
+                      ),
+                      loginButtonText: Text(
+                        _config.loginText.loginButton,
+                        style: widget.loginButtonTextStyle,
+                        textAlign: TextAlign.center,
+                      ),
+                      registerButtonText: Text(
+                        _config.registerText.registerButton,
+                        style: widget.registerButtonTextStyle,
+                        textAlign: TextAlign.center,
+                      ),
+                      loginDetailsTitle: Text(
+                        _config.loginText.loginDetails,
+                        style: widget.detailsStyle ??
+                            Theme.of(context)
                                 .textTheme
                                 .titleMedium
                                 ?.copyWith(color: Colors.black),
-                            textAlign: TextAlign.center,
-                          ),
+                        textAlign: TextAlign.center,
+                      ),
                       onLogin: () => {
                         if (widget.onLogin != null) {widget.onLogin!()},
                         setState(() {
@@ -177,16 +215,20 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                           });
                         }),
                       },
-                      loginTitle:Text(
-                            _config.loginText.loginTitle,
-                            style: TextStyle(color: Colors.black),
-                          ),
-                      registerTitle:Text(
-                            _config.registerText.registerTitle,
-                            style: TextStyle(color: Colors.black),
-                          ),
+                      loginTitle: Text(
+                        _config.loginText.loginTitle,
+                        style:
+                            widget.titleStyle ?? TextStyle(color: Colors.black),
+                        textAlign: TextAlign.center,
+                      ),
+                      registerTitle: Text(
+                        _config.registerText.registerTitle,
+                        style:
+                            widget.titleStyle ?? TextStyle(color: Colors.black),
+                        textAlign: TextAlign.center,
+                      ),
                       passwordLoginHint: _config.generalText.passwordHint,
-                      emailLoginHint:_config.generalText.emailHint,
+                      emailLoginHint: _config.generalText.emailHint,
                       onRegister: () => {
                         if (widget.onRegister != null) {widget.onRegister!()},
                         setState(() {
@@ -199,91 +241,106 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                           });
                         }),
                       },
-                      registerDetails:Text(
-                            _config.registerText.registerDetails,
-                            style: Theme.of(context)
+                      registerDetails: Text(
+                        _config.registerText.registerDetails,
+                        style: widget.detailsStyle ??
+                            Theme.of(context)
                                 .textTheme
                                 .titleMedium
                                 ?.copyWith(color: Colors.black),
-                          ),
+                        textAlign: TextAlign.center,
+                      ),
                       passwordRegisterHint: _config.generalText.passwordHint,
-                      repeatPasswordRegisterHint: _config.registerText.repeatPasswordHint,
+                      repeatPasswordRegisterHint:
+                          _config.registerText.repeatPasswordHint,
                       emailRegisterHint: _config.generalText.emailHint,
-                      missingPasswordTitle: _config.generalText.missingPasswordTitle,
-                      missingPasswordDetails: _config.generalText.missingPasswordDetails,
+                      missingPasswordTitle:
+                          _config.generalText.missingPasswordTitle,
+                      missingPasswordDetails:
+                          _config.generalText.missingPasswordDetails,
                       missingEmailTitle: _config.generalText.missingEmailTitle,
-                      missingEmailDetails: _config.generalText.missingEmailDetails,
+                      missingEmailDetails:
+                          _config.generalText.missingEmailDetails,
                       invalidTitle: _config.generalText.errorTitle,
                       invalidDetails: _config.generalText.errorDescription,
-                      passwordDoNotMatchTitle: _config.registerText.passwordDoNotMatchTitle,
-                      passwordDoNotMatchDetails:_config.registerText.passwordDoNotMatchDetails,
+                      passwordDoNotMatchTitle:
+                          _config.registerText.passwordDoNotMatchTitle,
+                      passwordDoNotMatchDetails:
+                          _config.registerText.passwordDoNotMatchDetails,
                       errorColor: widget.errorColor ?? Colors.redAccent,
                       successColor: widget.successColor ?? Color(0xff2862FF),
                       containsEightCharactersText: Text(
-                                _config.registerText.containsEightChars,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1
-                                    ?.copyWith(color: Colors.black),
-                              ),
+                        _config.registerText.containsEightChars,
+                        style: widget.bodyTextStyle ??
+                            Theme.of(context)
+                                .textTheme
+                                .bodyText1
+                                ?.copyWith(color: Colors.black),
+                      ),
                       containsSpecialText: Text(
-                            _config.registerText.containsSpecialChar,
-                            style: Theme.of(context)
+                        _config.registerText.containsSpecialChar,
+                        style: widget.bodyTextStyle ??
+                            Theme.of(context)
                                 .textTheme
                                 .bodyText1
                                 ?.copyWith(color: Colors.black),
-                          ),
-                      containsNumberText:
-                          Text(
-                            _config.registerText.containsNumberChar,
-                            style: Theme.of(context)
+                      ),
+                      containsNumberText: Text(
+                        _config.registerText.containsNumberChar,
+                        style: widget.bodyTextStyle ??
+                            Theme.of(context)
                                 .textTheme
                                 .bodyText1
                                 ?.copyWith(color: Colors.black),
-                          ),
-                      passwordMatchText:
-                          Text(
-                            _config.registerText.passwordMustMatch,
-                            style: Theme.of(context)
+                      ),
+                      passwordMatchText: Text(
+                        _config.registerText.passwordMustMatch,
+                        style: widget.bodyTextStyle ??
+                            Theme.of(context)
                                 .textTheme
                                 .bodyText1
                                 ?.copyWith(color: Colors.black),
-                          ),
+                      ),
                     );
                   } else {
                     print(snapshot.data);
                     return NoConnection(
-                      createdBy:
-                          Text(
-                            _config.generalText.createdBy,
-                            style: Theme.of(context)
+                      createdBy: Text(
+                        _config.generalText.createdBy,
+                        style: widget.createdByStyle ??
+                            Theme.of(context)
                                 .textTheme
                                 .titleSmall
                                 ?.copyWith(color: Colors.black),
-                          ),
+                        textAlign: TextAlign.center,
+                      ),
                       title: Text(
-                            _config.generalText.noWifiTitle,
-                            style: Theme.of(context)
+                        _config.generalText.noWifiTitle,
+                        style: widget.titleStyle ??
+                            Theme.of(context)
                                 .textTheme
                                 .titleLarge
                                 ?.copyWith(color: Colors.black),
-                            textAlign: TextAlign.center,
-                          ),
+                        textAlign: TextAlign.center,
+                      ),
                       details: Text(
                         _config.generalText.noWifiDescription,
-                            style: Theme.of(context)
+                        style: widget.detailsStyle ??
+                            Theme.of(context)
                                 .textTheme
                                 .titleMedium
                                 ?.copyWith(color: Colors.black),
-                            textAlign: TextAlign.center,
-                          ),
+                        textAlign: TextAlign.center,
+                      ),
                       logo: widget.logo ??
                           Text(
                             "Move fast. Stay in control.",
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(color: Colors.black),
+                            style: widget.titleStyle ??
+                                Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(color: Colors.black),
+                            textAlign: TextAlign.center,
                           ),
                       background: widget.background ??
                           BoxDecoration(color: Colors.white),
