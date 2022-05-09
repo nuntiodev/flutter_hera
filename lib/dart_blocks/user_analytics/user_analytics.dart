@@ -36,7 +36,7 @@ class _UserAnalyticsState extends State<UserAnalytics>
 
   Future<void> _measureUserTime() async {
     try {
-      if (_timer != null) {
+      if (_timer != null && _timer!.isActive) {
         _timer!.cancel();
       }
       if (_prefs != null) {
@@ -103,7 +103,7 @@ class _UserAnalyticsState extends State<UserAnalytics>
         } catch (e) {
           print(e);
         }
-        if (_timer != null) {
+        if (_timer != null && _timer!.isActive) {
           _timer!.cancel();
         }
       }

@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
         background: BoxDecoration(
           color: Colors.white,
         ),
-        secondaryColor: Colors.blueAccent[700],
+        registerButtonColor: Colors.blueAccent[700],
         textFieldBorder: Border.all(
           color: Colors.black12,
           width: 0.5,

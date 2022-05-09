@@ -122,7 +122,6 @@ class UserBlock {
     String? email,
     String? image,
     String? password,
-    bool? validatePassword,
     dynamic metadata,
   }) async {
     dart_blocks.UserRequest req = dart_blocks.UserRequest();
@@ -132,7 +131,6 @@ class UserBlock {
     user.email = email ?? "";
     user.image = image ?? "";
     user.password = password ?? "";
-    req.validatePassword = validatePassword ?? false;
     req.cloudToken = await _authorize.getAccessToken();
     req.encryptionKey = _encryptionKey ?? "";
     req.user = user;
@@ -150,7 +148,62 @@ class UserBlock {
     }
   }
 
-  Future<void> login({
+  Future<dart_blocks.User> updateEmail({
+    String? userId,
+    String? optionalId,
+    String? currentEmail,
+    required String newEmail,
+  }) async {
+    dart_blocks.UserRequest req = dart_blocks.UserRequest();
+    dart_blocks.User get = dart_blocks.User();
+    get.id = userId ?? "";
+    get.optionalId = optionalId ?? "";
+    get.email = currentEmail ?? "";
+    dart_blocks.User update = dart_blocks.User();
+    update.email = newEmail;
+    req.cloudToken = await _authorize.getAccessToken();
+    req.encryptionKey = _encryptionKey ?? "";
+    req.user = get;
+    req.update = update;
+    try {
+      dart_blocks.UserResponse resp = await _grpcUserClient.updateEmail(req);
+      _setCurrentUser(_currentUser..email = newEmail);
+      return resp.user;
+    } catch (e) {
+      if (debug == true)
+        print("could not create user with err: " + e.toString());
+      rethrow;
+    }
+  }
+
+  Future<dart_blocks.User> updatePassword({
+    String? userId,
+    String? optionalId,
+    String? currentEmail,
+    required String newPassword,
+  }) async {
+    dart_blocks.UserRequest req = dart_blocks.UserRequest();
+    dart_blocks.User get = dart_blocks.User();
+    get.id = userId ?? "";
+    get.optionalId = optionalId ?? "";
+    get.email = currentEmail ?? "";
+    dart_blocks.User update = dart_blocks.User();
+    update.password = newPassword;
+    req.cloudToken = await _authorize.getAccessToken();
+    req.encryptionKey = _encryptionKey ?? "";
+    req.user = get;
+    req.update = update;
+    try {
+      dart_blocks.UserResponse resp = await _grpcUserClient.updatePassword(req);
+      return resp.user;
+    } catch (e) {
+      if (debug == true)
+        print("could not create user with err: " + e.toString());
+      rethrow;
+    }
+  }
+
+  Future<dart_blocks.LoginSession> login({
     String? userId,
     String? optionalId,
     String? email,
@@ -184,6 +237,10 @@ class UserBlock {
     req.token = _token;
     try {
       dart_blocks.UserResponse resp = await _grpcUserClient.login(req);
+      if (resp.loginSession.loginStatus !=
+          dart_blocks.LoginStatus.AUTHENTICATED) {
+        return resp.loginSession;
+      }
       if (resp.token.accessToken == "" || resp.token.refreshToken == "") {
         throw Exception("token is null. Contact info@nuntio.io");
       }
@@ -197,6 +254,8 @@ class UserBlock {
       if (debug == true) print("could not login user: " + e.toString());
       rethrow;
     }
+    return dart_blocks.LoginSession()
+      ..loginStatus = dart_blocks.LoginStatus.AUTHENTICATED;
   }
 
   Future<void> logout() async {
@@ -220,6 +279,36 @@ class UserBlock {
       _refreshToken = "";
     } catch (e) {
       if (debug == true) print("could not logout user: " + e.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> verifyEmailCode({
+    String? userId,
+    String? optionalId,
+    String? email,
+    required String code,
+  }) async {
+    if (userId == null && optionalId == null && email == null) {
+      throw Exception(
+          "missing one required identifier: userId, optionalId or email");
+    } else if (code == "") {
+      throw Exception("email verification code is empty");
+    }
+    String cloudToken = await _authorize.getAccessToken();
+    dart_blocks.UserRequest req = dart_blocks.UserRequest();
+    dart_blocks.User user = dart_blocks.User();
+    user.id = userId ?? "";
+    user.optionalId = optionalId ?? "";
+    user.email = email ?? "";
+    req.cloudToken = cloudToken;
+    req.encryptionKey = _encryptionKey ?? "";
+    req.user = user;
+    req.emailVerificationCode = code;
+    try {
+      await _grpcUserClient.verifyEmail(req);
+    } catch (e) {
+      if (debug == true) print("could verify email with err: " + e.toString());
       rethrow;
     }
   }

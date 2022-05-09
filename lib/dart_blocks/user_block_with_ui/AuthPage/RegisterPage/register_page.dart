@@ -1,8 +1,10 @@
 import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nuntio_blocks/block_user.pbenum.dart';
 
 import '../../../components/text_field_decoration.dart';
+import '../verify_code_sheet/verify_code_sheet.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({
@@ -39,6 +41,7 @@ class RegisterPage extends StatefulWidget {
     required this.buttonHeight,
     required this.buttonWidth,
     required this.arrowBackColor,
+    required this.verifyCodeTitle,
   }) : super(key: key);
 
   final double buttonHeight;
@@ -73,6 +76,8 @@ class RegisterPage extends StatefulWidget {
   final Widget containsNumberText;
   final Widget passwordMatchText;
   final Color arrowBackColor;
+  final Widget verifyCodeTitle;
+
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
@@ -88,23 +93,6 @@ class _RegisterPageState extends State<RegisterPage> {
   bool containsNumber = false;
   bool containsSpecial = false;
   bool passwordMatch = false;
-
-  onRepeatPasswordChange() {
-    if (!widget.validatePassword) {
-      return;
-    }
-    if (repeatPasswordController.text != "" &&
-        passwordController.text != "" &&
-        repeatPasswordController.text == passwordController.text) {
-      setState(() {
-        passwordMatch = true;
-      });
-    } else {
-      setState(() {
-        passwordMatch = false;
-      });
-    }
-  }
 
   onPasswordChange() {
     if (!widget.validatePassword) {
@@ -144,6 +132,17 @@ class _RegisterPageState extends State<RegisterPage> {
           containsEightCharacters = false;
         });
       }
+      if (repeatPasswordController.text != "" &&
+          passwordController.text != "" &&
+          repeatPasswordController.text == passwordController.text) {
+        setState(() {
+          passwordMatch = true;
+        });
+      } else {
+        setState(() {
+          passwordMatch = false;
+        });
+      }
     } else {
       setState(() {
         containsEightCharacters = false;
@@ -151,6 +150,33 @@ class _RegisterPageState extends State<RegisterPage> {
         passwordMatch = false;
       });
     }
+  }
+
+  afterLoginFailure() {
+    passwordController.text = "";
+    emailController.text = "";
+    repeatPasswordController.text = "";
+    setState(() {
+      isLoading = false;
+      containsEightCharacters = false;
+      containsNumber = false;
+      containsSpecial = false;
+      passwordMatch = false;
+    });
+  }
+
+  afterLoginSuccess() {
+    passwordController.text = "";
+    emailController.text = "";
+    repeatPasswordController.text = "";
+    setState(() {
+      isLoading = false;
+      containsEightCharacters = false;
+      containsNumber = false;
+      containsSpecial = false;
+      passwordMatch = false;
+    });
+    widget.onRegister();
   }
 
   @override
@@ -225,7 +251,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           decoration: textFieldDecoration(
                               widget.textFieldBorder, widget.textFieldColor),
                           controller: repeatPasswordController,
-                          onChanged: (_) => onRepeatPasswordChange(),
+                          onChanged: (_) => onPasswordChange(),
                           obscureText: true,
                           placeholder: widget.repeatPasswordHint,
                           keyboardType: TextInputType.text,
@@ -402,7 +428,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 .create(
                               password: passwordController.text,
                               email: emailController.text,
-                              validatePassword: widget.validatePassword,
                             )
                                 .catchError((err) {
                               passwordController.text = "";
@@ -437,18 +462,39 @@ class _RegisterPageState extends State<RegisterPage> {
                                   .login(
                                       password: passwordController.text,
                                       email: emailController.text)
-                                  .then((value) {
-                                passwordController.text = "";
-                                emailController.text = "";
-                                repeatPasswordController.text = "";
-                                setState(() {
-                                  isLoading = false;
-                                  containsEightCharacters = false;
-                                  containsNumber = false;
-                                  containsSpecial = false;
-                                  passwordMatch = false;
-                                });
-                                widget.onRegister();
+                                  .then((loginSession) {
+                                if (loginSession.loginStatus ==
+                                    LoginStatus.EMAIL_IS_NOT_VERIFIED) {
+                                  showCupertinoModalPopup(
+                                    context: context,
+                                    builder: (context) => VerifyCodeSheet(
+                                      buttonHeight: widget.buttonHeight,
+                                      buttonWidth: widget.buttonWidth,
+                                      verifyCodeTitle: widget.verifyCodeTitle,
+                                      userEmail: emailController.text,
+                                      emailSentAt: DateTime.now().subtract(Duration(
+                                          minutes:
+                                              15)), //todo: edit to correct value
+                                    ),
+                                  ).catchError((err) {
+                                    afterLoginFailure();
+                                    //todo show error message with user created;
+                                  }).then((value) {
+                                    // login again
+                                    NuntioClient.userBlock
+                                        .login(
+                                            password: passwordController.text,
+                                            email: emailController.text)
+                                        .catchError((err) {
+                                      afterLoginFailure();
+                                      //todo: show error message with user created;
+                                    }).then((value) {
+                                      afterLoginSuccess();
+                                    });
+                                  });
+                                } else {
+                                  afterLoginSuccess();
+                                }
                               });
                             });
                           },

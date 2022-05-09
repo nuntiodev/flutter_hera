@@ -13,8 +13,8 @@ class UserBlockWithUI extends StatefulWidget {
   UserBlockWithUI({
     Key? key,
     required this.child,
-    this.primaryColor,
-    this.secondaryColor,
+    this.loginButtonColor,
+    this.registerButtonColor,
     this.onRegister,
     this.onLogin,
     this.textFieldBorder,
@@ -41,8 +41,8 @@ class UserBlockWithUI extends StatefulWidget {
   final Widget? logo;
 
   // colors
-  final Color? primaryColor;
-  final Color? secondaryColor;
+  final Color? loginButtonColor;
+  final Color? registerButtonColor;
   final Color? successColor;
   final Color? errorColor;
   final Color? textFieldColor;
@@ -78,10 +78,14 @@ class UserBlockWithUI extends StatefulWidget {
 class _UserBlockWithUIState extends State<UserBlockWithUI> {
   // init
   late Future<AuthState> initializeNuntioUIFuture;
-  late final Config _config;
+  late Config _config;
 
-  Future<AuthState> initializeNuntioUI() async {
+  Future<void> initializeConfig() async {
     _config = await NuntioClient.userBlock.getConfiguration();
+    return;
+  }
+
+  Future<AuthState> initializeAuthStatus() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
       //  no data connection
@@ -94,6 +98,11 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
     return AuthState.notAuthenticated;
   }
 
+  Future<AuthState> initializeNuntioUI() async {
+    await initializeConfig();
+    return await initializeAuthStatus();
+  }
+
   _UserBlockWithUIState() {
     initializeNuntioUIFuture = initializeNuntioUI();
   }
@@ -102,7 +111,8 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
   Widget build(BuildContext context) {
     return UserAnalytics(
       child: CupertinoPageScaffold(
-        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
+        backgroundColor: CupertinoColors.systemBackground,
         child: FutureBuilder<AuthState>(
             future: initializeNuntioUIFuture,
             builder: (BuildContext context, AsyncSnapshot<AuthState> snapshot) {
@@ -117,11 +127,22 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                   } else if (snapshot.data == null ||
                       snapshot.data == AuthState.notAuthenticated) {
                     return WelcomePage(
-                      arrowBackColor: widget.arrowBackColor ?? Colors.black,
-                      forgotPasswordColor: widget.forgotPasswordColor ?? Colors.black,
+                      verifyCodeTitle: Text(
+                        "Enter your verification code",
+                        style: widget.titleStyle ??
+                            Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(color: CupertinoColors.black),
+                        textAlign: TextAlign.center,
+                      ),
+                      arrowBackColor:
+                          widget.arrowBackColor ?? CupertinoColors.black,
+                      forgotPasswordColor:
+                          widget.forgotPasswordColor ?? CupertinoColors.black,
                       disableConnect: !_config.enableNuntioConnect,
                       disableLogin: _config.disableDefaultLogin,
-                      infoColor: widget.infoColor ?? Colors.black,
+                      infoColor: widget.infoColor ?? CupertinoColors.black,
                       buttonHeight: widget.buttonHeight ?? 55,
                       buttonWidth: widget.buttonWidth ?? 280,
                       disableRegistration: _config.disableDefaultSignup,
@@ -135,7 +156,8 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                       forgotPasswordText: Text(
                         _config.loginText.forgotPassword,
                         style: TextStyle(
-                          color: widget.forgotPasswordColor ?? Colors.black,
+                          color: widget.forgotPasswordColor ??
+                              CupertinoColors.black,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -148,15 +170,16 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                                   Theme.of(context)
                                       .textTheme
                                       .titleLarge
-                                      ?.copyWith(color: Colors.black),
+                                      ?.copyWith(color: CupertinoColors.black),
                               textAlign: TextAlign.center,
                             ),
                           ),
                       background: widget.background ??
                           BoxDecoration(color: Colors.white),
-                      primaryColor: widget.primaryColor ?? Colors.black,
-                      secondaryColor:
-                          widget.secondaryColor ?? Color(0xff2862FF),
+                      loginButtonColor:
+                          widget.loginButtonColor ?? const Color(0xff0080ff),
+                      registerButtonColor: widget.registerButtonColor ??
+                          CupertinoColors.lightBackgroundGray,
                       welcomeDetails: Text(
                         _config.welcomeText.welcomeDetails,
                         style: widget.detailsStyle ??
@@ -178,36 +201,46 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                       welcomeTitle: Text(
                         _config.welcomeText.welcomeTitle,
                         style: widget.titleStyle ??
-                            Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(color: Colors.black),
+                            Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  color: CupertinoColors.black,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                       loginButtonText: Text(
                         _config.loginText.loginButton,
-                        style: widget.loginButtonTextStyle,
+                        style: widget.loginButtonTextStyle ??
+                            TextStyle(
+                              color: CupertinoColors.white,
+                              fontWeight: FontWeight.w400,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                       registerButtonText: Text(
                         _config.registerText.registerButton,
-                        style: widget.registerButtonTextStyle,
+                        style: widget.registerButtonTextStyle ??
+                            TextStyle(
+                              color: CupertinoColors.black,
+                              fontWeight: FontWeight.w400,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                       loginDetailsTitle: Text(
                         _config.loginText.loginDetails,
                         style: widget.detailsStyle ??
-                            Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(color: Colors.black),
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: CupertinoColors.black,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                       onLogin: () => {
                         if (widget.onLogin != null) {widget.onLogin!()},
                         setState(() {
                           initializeNuntioUIFuture =
-                              initializeNuntioUI().then((isAuthenticated) {
+                              initializeNuntioUI().catchError((onError) {
+                            print("Something went wrong" + onError.toString());
+                          }).then((isAuthenticated) {
+                            print("User is authenticated:" +
+                                isAuthenticated.toString());
                             if (isAuthenticated == AuthState.authenticated) {
                               Navigator.pop(context);
                             }
@@ -217,14 +250,18 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                       },
                       loginTitle: Text(
                         _config.loginText.loginTitle,
-                        style:
-                            widget.titleStyle ?? TextStyle(color: Colors.black),
+                        style: widget.titleStyle ??
+                            TextStyle(
+                              color: CupertinoColors.black,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                       registerTitle: Text(
                         _config.registerText.registerTitle,
-                        style:
-                            widget.titleStyle ?? TextStyle(color: Colors.black),
+                        style: widget.titleStyle ??
+                            TextStyle(
+                              color: CupertinoColors.black,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                       passwordLoginHint: _config.generalText.passwordHint,
@@ -244,10 +281,9 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                       registerDetails: Text(
                         _config.registerText.registerDetails,
                         style: widget.detailsStyle ??
-                            Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(color: Colors.black),
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: CupertinoColors.black,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                       passwordRegisterHint: _config.generalText.passwordHint,
@@ -267,39 +303,37 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                           _config.registerText.passwordDoNotMatchTitle,
                       passwordDoNotMatchDetails:
                           _config.registerText.passwordDoNotMatchDetails,
-                      errorColor: widget.errorColor ?? Colors.redAccent,
-                      successColor: widget.successColor ?? Color(0xff2862FF),
+                      errorColor:
+                          widget.errorColor ?? CupertinoColors.systemRed,
+                      successColor:
+                          widget.successColor ?? CupertinoColors.systemBlue,
                       containsEightCharactersText: Text(
                         _config.registerText.containsEightChars,
                         style: widget.bodyTextStyle ??
-                            Theme.of(context)
-                                .textTheme
-                                .bodyText1
-                                ?.copyWith(color: Colors.black),
+                            Theme.of(context).textTheme.bodyText1?.copyWith(
+                                  color: CupertinoColors.black,
+                                ),
                       ),
                       containsSpecialText: Text(
                         _config.registerText.containsSpecialChar,
                         style: widget.bodyTextStyle ??
-                            Theme.of(context)
-                                .textTheme
-                                .bodyText1
-                                ?.copyWith(color: Colors.black),
+                            Theme.of(context).textTheme.bodyText1?.copyWith(
+                                  color: CupertinoColors.black,
+                                ),
                       ),
                       containsNumberText: Text(
                         _config.registerText.containsNumberChar,
                         style: widget.bodyTextStyle ??
-                            Theme.of(context)
-                                .textTheme
-                                .bodyText1
-                                ?.copyWith(color: Colors.black),
+                            Theme.of(context).textTheme.bodyText1?.copyWith(
+                                  color: CupertinoColors.black,
+                                ),
                       ),
                       passwordMatchText: Text(
                         _config.registerText.passwordMustMatch,
                         style: widget.bodyTextStyle ??
-                            Theme.of(context)
-                                .textTheme
-                                .bodyText1
-                                ?.copyWith(color: Colors.black),
+                            Theme.of(context).textTheme.bodyText1?.copyWith(
+                                  color: CupertinoColors.black,
+                                ),
                       ),
                     );
                   } else {
@@ -308,28 +342,25 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                       createdBy: Text(
                         _config.generalText.createdBy,
                         style: widget.createdByStyle ??
-                            Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(color: Colors.black),
+                            Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  color: CupertinoColors.black,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                       title: Text(
                         _config.generalText.noWifiTitle,
                         style: widget.titleStyle ??
-                            Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(color: Colors.black),
+                            Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  color: CupertinoColors.black,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                       details: Text(
                         _config.generalText.noWifiDescription,
                         style: widget.detailsStyle ??
-                            Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(color: Colors.black),
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: CupertinoColors.black,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                       logo: widget.logo ??
@@ -339,12 +370,15 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
                                 Theme.of(context)
                                     .textTheme
                                     .titleLarge
-                                    ?.copyWith(color: Colors.black),
+                                    ?.copyWith(
+                                      color: CupertinoColors.black,
+                                    ),
                             textAlign: TextAlign.center,
                           ),
                       background: widget.background ??
-                          BoxDecoration(color: Colors.white),
-                      primaryColor: widget.primaryColor ?? Colors.black,
+                          BoxDecoration(color: CupertinoColors.white),
+                      primaryColor:
+                          widget.loginButtonColor ?? CupertinoColors.black,
                     );
                   }
                 default:

@@ -20,8 +20,8 @@ class WelcomePage extends StatelessWidget {
     required this.loginDetailsTitle,
     required this.registerDetails,
     required this.onRegister,
-    required this.primaryColor,
-    required this.secondaryColor,
+    required this.loginButtonColor,
+    required this.registerButtonColor,
     required this.loginTitle,
     required this.registerTitle,
     required this.logo,
@@ -53,12 +53,13 @@ class WelcomePage extends StatelessWidget {
     required this.disableConnect,
     required this.arrowBackColor,
     required this.forgotPasswordColor,
+    required this.verifyCodeTitle,
   });
 
   // general
   final Widget createdBy;
-  final Color primaryColor;
-  final Color secondaryColor;
+  final Color loginButtonColor;
+  final Color registerButtonColor;
   final BoxDecoration background;
   final Border textFieldBorder;
   final Color textFieldColor;
@@ -96,6 +97,9 @@ class WelcomePage extends StatelessWidget {
   final String passwordLoginHint;
   final Widget forgotPasswordText;
 
+  // verify email
+  final Widget verifyCodeTitle;
+
   // register
   final bool disableRegistration;
   final bool validatePassword;
@@ -125,17 +129,18 @@ class WelcomePage extends StatelessWidget {
     // than having to individually change instances of widgets.
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: false,
-      navigationBar: CupertinoNavigationBar(
+      /*navigationBar: CupertinoNavigationBar(
         backgroundColor: Colors.transparent,
         trailing: CupertinoButton(
           child: Icon(
-            Icons.info_outline,
+            Icons.info_outline_rounded,
             color: infoColor,
           ),
           onPressed: () => print("info about org goes here"),
         ),
         border: null,
       ),
+       */
       child: Container(
         height: MediaQuery.of(context).size.height,
         decoration: background,
@@ -164,8 +169,8 @@ class WelcomePage extends StatelessWidget {
                     child: CupertinoButton(
                       color: MediaQuery.of(context).platformBrightness ==
                               Brightness.light
-                          ? Colors.black.withOpacity(0.95)
-                          : Colors.white.withOpacity(0.95),
+                          ? CupertinoColors.black
+                          : CupertinoColors.white,
                       padding: EdgeInsets.all(5),
                       alignment: Alignment.center,
                       onPressed: () {},
@@ -186,11 +191,13 @@ class WelcomePage extends StatelessWidget {
                             style: MediaQuery.of(context).platformBrightness ==
                                     Brightness.light
                                 ? TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500)
+                                    color: CupertinoColors.white,
+                                    fontWeight: FontWeight.w500,
+                                  )
                                 : TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500),
+                                    color: CupertinoColors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                           ),
                         ],
                       ),
@@ -205,12 +212,13 @@ class WelcomePage extends StatelessWidget {
                     width: buttonWidth,
                     height: buttonHeight,
                     child: CupertinoButton(
-                      color: primaryColor,
+                      color: loginButtonColor,
                       onPressed: () {
                         Navigator.push(
                           context,
                           CupertinoPageRoute(
                             builder: (context) => LoginPage(
+                              verifyCodeTitle: verifyCodeTitle,
                               arrowBackColor: arrowBackColor,
                               buttonWidth: buttonWidth,
                               buttonHeight: buttonHeight,
@@ -220,8 +228,8 @@ class WelcomePage extends StatelessWidget {
                               emailHint: emailLoginHint,
                               createdBy: createdBy,
                               background: background,
-                              primaryColor: primaryColor,
-                              secondaryColor: secondaryColor,
+                              primaryColor: loginButtonColor,
+                              secondaryColor: registerButtonColor,
                               title: loginTitle,
                               logo: logo,
                               passwordHint: passwordLoginHint,
@@ -250,7 +258,7 @@ class WelcomePage extends StatelessWidget {
                     width: buttonWidth,
                     height: buttonHeight,
                     child: CupertinoButton(
-                      color: secondaryColor,
+                      color: registerButtonColor,
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -264,8 +272,8 @@ class WelcomePage extends StatelessWidget {
                               validatePassword: validatePassword,
                               textFieldBorder: textFieldBorder,
                               textFieldColor: textFieldColor,
-                              secondaryColor: secondaryColor,
-                              primaryColor: primaryColor,
+                              secondaryColor: registerButtonColor,
+                              primaryColor: loginButtonColor,
                               buttonText: registerButtonText,
                               emailHint: emailRegisterHint,
                               background: background,
@@ -277,6 +285,7 @@ class WelcomePage extends StatelessWidget {
                               missingEmailTitle: missingEmailTitle,
                               missingPasswordDetails: missingPasswordDetails,
                               invalidDetails: invalidDetails,
+                              verifyCodeTitle: verifyCodeTitle,
                               invalidTitle: invalidTitle,
                               passwordDoNotMatchDetails:
                                   passwordDoNotMatchDetails,
@@ -297,9 +306,7 @@ class WelcomePage extends StatelessWidget {
                       child: registerButtonText,
                     ),
                   ),
-                const SizedBox(
-                  height: 50,
-                ),
+                Spacer(),
                 createdBy,
               ],
             ),

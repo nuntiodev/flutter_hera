@@ -2,6 +2,9 @@ import 'package:dart_blocks/dart_blocks/components/text_field_decoration.dart';
 import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nuntio_blocks/block_user.pb.dart';
+
+import '../verify_code_sheet/verify_code_sheet.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({
@@ -29,9 +32,11 @@ class LoginPage extends StatefulWidget {
     required this.buttonHeight,
     required this.buttonWidth,
     required this.arrowBackColor,
+    required this.verifyCodeTitle,
   }) : super(key: key);
 
   final Widget loginButtonText;
+  final Widget verifyCodeTitle;
   final BoxDecoration background;
   final Color primaryColor;
   final Color secondaryColor;
@@ -63,8 +68,26 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final verifyCodeController = TextEditingController();
 
   bool isLoading = false;
+
+  loginSuccess() {
+    setState(() {
+      isLoading = false;
+    });
+    passwordController.text = "";
+    emailController.text = "";
+    widget.onLogin();
+  }
+
+  loginFailure() {
+    setState(() {
+      isLoading = false;
+    });
+    passwordController.text = "";
+    emailController.text = "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -187,11 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                               email: emailController.text,
                             )
                                 .catchError((_) {
-                              setState(() {
-                                isLoading = false;
-                              });
-                              passwordController.text = "";
-                              emailController.text = "";
+                              loginFailure();
                               showCupertinoDialog(
                                   context: context,
                                   builder: (context) {
@@ -211,13 +230,36 @@ class _LoginPageState extends State<LoginPage> {
                                       ],
                                     );
                                   });
-                            }).then((user) {
-                              passwordController.text = "";
-                              emailController.text = "";
-                              setState(() {
-                                isLoading = false;
-                              });
-                              widget.onLogin();
+                            }).then((loginSession) {
+                              if (loginSession.loginStatus ==
+                                  LoginStatus.EMAIL_IS_NOT_VERIFIED) {
+                                showCupertinoModalPopup(
+                                  context: context,
+                                  builder: (context) => VerifyCodeSheet(
+                                    buttonHeight: widget.buttonHeight,
+                                    buttonWidth: widget.buttonWidth,
+                                    verifyCodeTitle: widget.verifyCodeTitle,
+                                    userEmail: emailController.text,
+                                    emailSentAt: DateTime.now()
+                                        .subtract(Duration(minutes: 15)), //todo: edit to correct value
+                                  ),
+                                ).catchError((err) {
+                                  loginFailure();
+                                }).then((value) {
+                                  // login again
+                                  NuntioClient.userBlock
+                                      .login(
+                                          password: passwordController.text,
+                                          email: emailController.text)
+                                      .catchError((err) {
+                                    loginFailure();
+                                  }).then((value) {
+                                    loginSuccess();
+                                  });
+                                });
+                              } else {
+                                loginSuccess();
+                              }
                             });
                           },
                           child: isLoading
