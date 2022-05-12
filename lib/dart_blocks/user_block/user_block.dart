@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' as WhichPlatform;
+import 'package:biometric_storage/biometric_storage.dart';
+import 'package:dart_blocks/dart_blocks/models/biometric_data.dart';
 import 'package:dart_blocks/nuntio_authorize/nuntio_authorize.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/foundation.dart';
@@ -12,11 +14,16 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const String biometricsNotEnabled =
+    "Cannot read from biometric storage. Checkout: https://pub.dev/packages/biometric_storage.";
+
 class UserBlock {
   UserBlock({
     required dart_blocks.UserServiceClient grpcUserClient,
     required Authorize authorize,
     required String? jwtPublicKey,
+    required this.sharedPreferences,
+    this.biometricStorage,
     this.debug,
     String? encryptionKey,
     Function? onLogin,
@@ -27,14 +34,16 @@ class UserBlock {
     _authorize = authorize;
     _encryptionKey = encryptionKey;
     _jwtPublicKey = jwtPublicKey;
-    _storage = FlutterSecureStorage();
+    _secureStorage = FlutterSecureStorage();
   }
 
   // Debug will print error logs if true
   late final bool? debug;
 
   // Create storage which is used to store tokens
-  late final FlutterSecureStorage _storage;
+  late final FlutterSecureStorage _secureStorage;
+  late final SharedPreferences sharedPreferences;
+  final BiometricStorage? biometricStorage;
 
   // _grpcUserClient is an object to communicate with the dart_blocks
   late final dart_blocks.UserServiceClient _grpcUserClient;
@@ -63,13 +72,15 @@ class UserBlock {
   // _placemark is used to send data to the backend about user location
   Placemark? _placemark;
 
+  final String _savedBiometricUsersKey = "nuntio-shared-biometric-users";
+
   static final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
 
   Future<dart_blocks.User> getCurrentUser() async {
     if (_currentUser.id != "") {
       return _currentUser;
     }
-    var jsonCurrentUser = await _storage.read(key: _currentUserKey);
+    var jsonCurrentUser = await _secureStorage.read(key: _currentUserKey);
     if (jsonCurrentUser != null && jsonCurrentUser != "") {
       _currentUser = dart_blocks.User.fromJson(jsonCurrentUser);
       return _currentUser;
@@ -79,14 +90,15 @@ class UserBlock {
 
   void _setCurrentUser(dart_blocks.User currentUser) async {
     _currentUser = currentUser;
-    _storage.write(key: _currentUserKey, value: currentUser.writeToJson());
+    _secureStorage.write(
+        key: _currentUserKey, value: currentUser.writeToJson());
   }
 
   Future<String> getAccessToken() async {
     if (_accessToken != "") {
       return _accessToken;
     }
-    var accessToken = await _storage.read(key: _accessTokenKey);
+    var accessToken = await _secureStorage.read(key: _accessTokenKey);
     if (accessToken != "") {
       _accessToken = accessToken!;
       return accessToken;
@@ -96,14 +108,14 @@ class UserBlock {
 
   void _setAccessToken(String accessToken) async {
     _accessToken = accessToken;
-    _storage.write(key: _accessTokenKey, value: accessToken);
+    _secureStorage.write(key: _accessTokenKey, value: accessToken);
   }
 
   Future<String> _getRefreshToken() async {
     if (_refreshToken != "") {
       return _refreshToken;
     }
-    var refreshToken = await _storage.read(key: _refreshTokenKey);
+    var refreshToken = await _secureStorage.read(key: _refreshTokenKey);
     if (refreshToken != "") {
       _refreshToken = refreshToken!;
       return refreshToken;
@@ -113,7 +125,7 @@ class UserBlock {
 
   void _setRefreshToken(String refreshToken) async {
     _refreshToken = refreshToken;
-    _storage.write(key: _refreshTokenKey, value: refreshToken);
+    _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
   }
 
   Future<dart_blocks.User> create({
@@ -272,8 +284,9 @@ class UserBlock {
       req.tokenPointer = await _getRefreshToken();
       _grpcUserClient.blockToken(req);
       // remove from secure storage
-      _storage.deleteAll();
-      (await SharedPreferences.getInstance()).clear();
+      _secureStorage.delete(key: _accessTokenKey);
+      _secureStorage.delete(key: _refreshTokenKey);
+      _secureStorage.delete(key: _currentUserKey);
       _currentUser = dart_blocks.User();
       _accessToken = "";
       _refreshToken = "";
@@ -319,7 +332,9 @@ class UserBlock {
       try {
         var accessToken = await getAccessToken();
         if (accessToken != "" &&
-            JwtDecoder.getRemainingTime(accessToken).inMinutes > 2) {
+            JwtDecoder
+                .getRemainingTime(accessToken)
+                .inMinutes > 2) {
           try {
             if (_jwtPublicKey == "") {
               throw Exception("empty jwt public key");
@@ -348,7 +363,7 @@ class UserBlock {
         _token.refreshToken = await _getRefreshToken();
         req.token = _token;
         dart_blocks.UserResponse refreshResp =
-            await _grpcUserClient.refreshToken(req);
+        await _grpcUserClient.refreshToken(req);
         _setAccessToken(refreshResp.token.accessToken);
         _setRefreshToken(refreshResp.token.refreshToken);
         return true;
@@ -360,13 +375,122 @@ class UserBlock {
     }
     return false;
   }
+  /*
+  Future<void> updateEnableBiometrics({
+    String? userId,
+    String? optionalId,
+    String? email,
+    required bool enableBiometrics,
+  }) async {
+    try {
+      if (biometricStorage != null &&
+          await BiometricStorage().canAuthenticate() ==
+              CanAuthenticateResponse.success) {
+        // get previous biometric accounts and add current
+        List<BiometricUser> _biometricUsers = <BiometricUser>[];
+        try {
+          _biometricUsers = await getBiometricUsers();
+        } catch (e) {
+          print("Could not get biometric users with err: " + e.toString());
+        }
+        // get id
+        String id = userId ?? optionalId ?? email ?? "";
+        if (enableBiometrics) {
+          if (_biometricUsers
+              .where((element) => element.id == id)
+              .isEmpty) {
+            // does not exist --> add
+            BiometricUser _newBiometricUser = BiometricUser(
+              accessToken: _accessToken,
+              refreshToken: _refreshToken,
+            );
+            // add to biometric storage
+            (await biometricStorage?.getStorage(id))
+                ?.write(jsonEncode(_newBiometricUser.toJson()));
+            // add to shared preferences
+            BiometricUser _newSharedUser =
+            BiometricUser(id: id, image: (await getCurrentUser()).image);
+            _biometricUsers.add(_newSharedUser);
+            await sharedPreferences.setStringList(
+                _savedBiometricUsersKey,
+                _biometricUsers
+                    .map((e) => e.id ?? "")
+                    .where((e) => e != "")
+                    .toList());
+            // set image
+            await sharedPreferences.setString(id, _currentUser.image);
+          }
+        } else {
+          if (_biometricUsers
+              .where((element) => element.id == id)
+              .isNotEmpty) {
+            (await biometricStorage?.getStorage(id))?.delete();
+            _biometricUsers.removeWhere((element) => element.id == id);
+            await sharedPreferences.setStringList(
+                _savedBiometricUsersKey,
+                _biometricUsers
+                    .map((e) => e.id ?? "")
+                    .where((e) => e != "")
+                    .toList());
+            await sharedPreferences.remove(id);
+          }
+        }
+        _setCurrentUser(_currentUser..enableBiometrics = enableBiometrics);
+      } else {
+        throw Exception(biometricsNotEnabled);
+      }
+    } catch (e) {
+      if (debug == true)
+        print("could not update user biometrics with err: " + e.toString());
+      rethrow;
+    }
+  }
+   */
 
-  Future<void> recordActiveMeasurement(
-      int seconds, String activeId, String userId) async {
+  /*
+  Future<void> loginFromBiometrics(String id) async {
+    if (biometricStorage != null &&
+        await BiometricStorage().canAuthenticate() ==
+            CanAuthenticateResponse.success) {
+      // get previous biometric accounts and add current
+      BiometricUsers _biometricData = await getBiometricUsers();
+      if (_biometricData.refreshToken != null &&
+          _biometricData.refreshToken?[id] != "") {
+        String cloudToken = await _authorize.getAccessToken();
+        dart_blocks.UserRequest req = dart_blocks.UserRequest();
+        req.cloudToken = cloudToken;
+        req.encryptionKey = _encryptionKey ?? "";
+        req.token = dart_blocks.Token()..refreshToken = _refreshToken;
+        // get valid token pair
+        dart_blocks.UserResponse resp = await _grpcUserClient.refreshToken(req);
+        _setAccessToken(resp.token.accessToken);
+        _setRefreshToken(resp.token.refreshToken);
+        // get current user from token
+        req.tokenPointer = _accessToken;
+        _currentUser = (await _grpcUserClient.validateToken(req)).user;
+      } else {
+        throw Exception("biometric data is not valid");
+      }
+    } else {
+      throw Exception(biometricsNotEnabled);
+    }
+  }
+   */
+  /*
+  Future<List<BiometricUser>> getBiometricUsers() async {
+    List<String> _biometricUsers =
+        (sharedPreferences.getStringList(_savedBiometricUsersKey)) ?? [];
+    return _biometricUsers.map((id) =>
+        BiometricUser(id: id, image: sharedPreferences.getString(id) ?? "")).toList();
+  }
+   */
+
+  Future<void> recordActiveMeasurement(int seconds, String activeId,
+      String userId) async {
     if (seconds > 0 && activeId != "" && userId != "") {
       dart_blocks.UserRequest req = dart_blocks.UserRequest();
       dart_blocks.ActiveMeasurement _activeMeasurement =
-          dart_blocks.ActiveMeasurement();
+      dart_blocks.ActiveMeasurement();
       _activeMeasurement.seconds = seconds;
       _activeMeasurement.id = activeId;
       _activeMeasurement.userId = userId;
@@ -398,8 +522,7 @@ class UserBlock {
   /// Determine the name of the device.
   Future<String?> _getDeviceInfo() async {
     try {
-      if (kIsWeb) {
-      } else {
+      if (kIsWeb) {} else {
         if (WhichPlatform.Platform.isAndroid) {
           return (await _deviceInfoPlugin.androidInfo).host ?? "";
         } else if (WhichPlatform.Platform.isIOS) {
@@ -460,7 +583,7 @@ class UserBlock {
       // continue accessing the position of the device.
       Position position = await Geolocator.getCurrentPosition();
       List<Placemark> placemarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
+      await placemarkFromCoordinates(position.latitude, position.longitude);
       _placemark = placemarks.first;
       return placemarks.first;
     } catch (e) {

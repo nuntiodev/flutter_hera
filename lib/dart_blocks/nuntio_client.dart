@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:biometric_storage/biometric_storage.dart';
 import 'package:dart_blocks/dart_blocks/user_block/user_block.dart';
 import 'package:dart_blocks/nuntio_authorize/nuntio_authorize.dart';
 import 'package:dart_blocks/nuntio_credentials/nuntio_credentials.dart';
 import 'package:nuntio_cloud/cloud_project.pbgrpc.dart';
 import 'package:grpc/grpc.dart';
 import 'package:nuntio_blocks/block_user.pbgrpc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NuntioClient {
   // _encryptionKey  is used to encrypt clients data under the given key
@@ -68,6 +70,13 @@ class NuntioClient {
         await _grpcUserClient.publicKeys(publicKeysReq);
     //todo: find out why this is empty
     String? jwtPublicKey = publicKeysResp.publicKeys["public-jwt-key"];
+    // biometric storage
+    BiometricStorage? _biometricStorage;
+    try {
+      _biometricStorage = await BiometricStorage();
+    } catch (err) {
+      print("biometric storage not available with err: " + err.toString());
+    }
     userBlock = UserBlock(
       grpcUserClient: _grpcUserClient,
       encryptionKey: _encryptionKey,
@@ -75,6 +84,8 @@ class NuntioClient {
       authorize: authorize,
       debug: debug,
       recordActive: recordActive,
+      biometricStorage: _biometricStorage,
+      sharedPreferences: await SharedPreferences.getInstance(),
     );
   }
 }

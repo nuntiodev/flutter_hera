@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class ProfileAvatar extends StatelessWidget {
   ProfileAvatar({
@@ -8,12 +9,14 @@ class ProfileAvatar extends StatelessWidget {
     required this.radius,
     this.background,
     this.border,
+    this.borderRadius
   }) : super(key: key);
 
   final String imageUrl;
   final double radius;
   final BoxDecoration? background;
   final BoxBorder? border;
+  final BorderRadius? borderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +29,10 @@ class ProfileAvatar extends StatelessWidget {
           width: radius * 2,
           height: radius * 2,
           decoration: BoxDecoration(
+            color: Colors.transparent,
             border: border,
-            shape: BoxShape.circle,
+            borderRadius: borderRadius,
+            shape: borderRadius == null ? BoxShape.circle : BoxShape.rectangle,
             image: DecorationImage(
               image: imageProvider,
               fit: BoxFit.cover,
@@ -44,13 +49,14 @@ class ProfileAvatar extends StatelessWidget {
                 BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xff686FFF),
-                      Color(0xff0512FF),
+                      Color(0xff141E30),
+                      Color(0xff243B55),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  shape: BoxShape.circle,
+                  borderRadius: borderRadius,
+                  shape: borderRadius == null ? BoxShape.circle : BoxShape.rectangle,
                 ),
             width: radius * 2,
             height: radius * 2,

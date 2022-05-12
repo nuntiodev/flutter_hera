@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class ButtonCard extends StatelessWidget {
-  ButtonCard({Key? key, required this.onClick, required this.text})
+  ButtonCard({Key? key, required this.onClick, required this.text, this.button})
       : super(key: key);
 
   final Function onClick;
   final Widget text;
+  final Widget? button;
 
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 65,
@@ -28,7 +30,7 @@ class ButtonCard extends StatelessWidget {
             children: [
               text,
               const Spacer(),
-              const Icon(
+              button ?? const Icon(
                 CupertinoIcons.right_chevron,
                 color: CupertinoColors.black,
                 size: 22,

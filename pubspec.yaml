@@ -1,6 +1,6 @@
 name: dart_blocks
 description: An SDK written in Dart to communicate with Nuntio Blocks and Cloud
-version: 0.3.2
+version: 0.3.68
 homepage: https://github.com/nuntiodev
 
 environment:
@@ -10,7 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  nuntio_blocks: ^0.0.14
+  nuntio_blocks: ^0.0.19
+  biometric_storage: ^4.1.1
   nuntio_cloud: ^0.0.1
   jwt_decoder: ^2.0.1
   protobuf: ^2.0.1

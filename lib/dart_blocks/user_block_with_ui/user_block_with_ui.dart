@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:dart_blocks/dart_blocks/models/auth.dart';
+import 'package:dart_blocks/dart_blocks/models/biometric_data.dart';
 import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:dart_blocks/dart_blocks/user_analytics/user_analytics.dart';
 import 'package:dart_blocks/dart_blocks/user_block_with_ui/NoConnection/no_connection.dart';

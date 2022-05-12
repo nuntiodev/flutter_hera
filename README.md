@@ -132,3 +132,58 @@ Geolocator Web is available only in [secure_contexts](https://developer.mozilla.
 
 To use the Geolocator plugin on Windows you need to be using Flutter 2.10 or higher. Flutter will automatically add the endorsed [geolocator_windows]() package to your application when you add the `geolocator: ^8.1.0` dependency to your `pubspec.yaml`.
 
+## Bio storage
+
+#### Android
+* Requirements:
+    * Android: API Level >= 23 (android/app/build.gradle `minSdkVersion 23`)
+    * Make sure to use the latest kotlin version:
+        * `android/build.gradle`: `ext.kotlin_version = '1.4.31'`
+    * MainActivity must extend FlutterFragmentActivity
+    * Theme for the main activity must use `Theme.AppCompat` thme.
+      (Otherwise there will be crases on Android < 29)
+      For example:
+
+      **AndroidManifest.xml**:
+      ```xml
+      <activity
+      android:name=".MainActivity"
+      android:launchMode="singleTop"
+      android:theme="@style/LaunchTheme"
+      ```
+
+      **xml/styles.xml**:
+      ```xml
+          <style name="LaunchTheme" parent="Theme.AppCompat.NoActionBar">
+          <!-- Show a splash screen on the activity. Automatically removed when
+               Flutter draws its first frame -->
+          <item name="android:windowBackground">@drawable/launch_background</item>
+  
+          <item name="android:windowNoTitle">true</item>
+          <item name="android:windowActionBar">false</item>
+          <item name="android:windowFullscreen">true</item>
+          <item name="android:windowContentOverlay">@null</item>
+      </style>
+      ```
+
+##### Resources
+
+* https://developer.android.com/topic/security/data
+* https://developer.android.com/topic/security/best-practices
+
+#### iOS
+
+https://developer.apple.com/documentation/localauthentication/logging_a_user_into_your_app_with_face_id_or_touch_id
+
+* include the NSFaceIDUsageDescription key in your app’s Info.plist file
+* Requires at least iOS 9
+
+#### Mac OS
+
+* include the NSFaceIDUsageDescription key in your app’s Info.plist file
+* enable keychain sharing and signing. (not sure why this is required. but without it
+  You will probably see an error like:
+  > SecurityError, Error while writing data: -34018: A required entitlement isn't present.
+* Requires at least Mac OS 10.12
+
+### Usage

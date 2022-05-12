@@ -121,26 +121,8 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: false,
-      /*navigationBar: CupertinoNavigationBar(
-        backgroundColor: Colors.transparent,
-        trailing: CupertinoButton(
-          child: Icon(
-            Icons.info_outline_rounded,
-            color: infoColor,
-          ),
-          onPressed: () => print("info about org goes here"),
-        ),
-        border: null,
-      ),
-       */
       child: Container(
         height: MediaQuery.of(context).size.height,
         decoration: background,
@@ -179,7 +161,7 @@ class WelcomePage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.network(
-                            "https://nuntiodev.github.io/website/nuntio/nuntio_white.png",
+                            "https://nuntiodev.github.io/website/nuntio/nuntio.png",
                             width: 22,
                           ),
                           SizedBox(

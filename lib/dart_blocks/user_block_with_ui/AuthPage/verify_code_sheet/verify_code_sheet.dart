@@ -11,11 +11,11 @@ class VerifyCodeSheet extends StatefulWidget {
     required this.buttonHeight,
     required this.buttonWidth,
     required this.userEmail,
-    required this.emailSentAt,
+    required this.emailExpiresAt,
   }) : super(key: key);
 
   final String userEmail;
-  final DateTime emailSentAt;
+  final DateTime emailExpiresAt;
   final Widget verifyCodeTitle;
   final double buttonWidth;
   final double buttonHeight;
@@ -29,13 +29,20 @@ class _VerifyCodeSheetState extends State<VerifyCodeSheet> {
   DateTime _now = DateTime.now();
   bool _isLoading = false;
   bool _hasError = false;
+  late Timer _timer;
 
   _VerifyCodeSheetState() {
-    Timer.periodic(Duration(seconds: 1), (Timer t) {
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
       setState(() {
         _now = DateTime.now();
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   String formatTime(int totalSeconds) {
@@ -62,7 +69,7 @@ class _VerifyCodeSheetState extends State<VerifyCodeSheet> {
                 height: 50,
               ),
               Text(
-                formatTime(_now.difference(widget.emailSentAt).inSeconds),
+                formatTime(widget.emailExpiresAt.difference(_now).inSeconds),
                 style: Theme.of(context)
                     .textTheme
                     .displaySmall

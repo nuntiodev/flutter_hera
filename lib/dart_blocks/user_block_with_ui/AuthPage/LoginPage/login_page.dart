@@ -240,8 +240,8 @@ class _LoginPageState extends State<LoginPage> {
                                     buttonWidth: widget.buttonWidth,
                                     verifyCodeTitle: widget.verifyCodeTitle,
                                     userEmail: emailController.text,
-                                    emailSentAt: DateTime.now()
-                                        .subtract(Duration(minutes: 15)), //todo: edit to correct value
+                                    emailExpiresAt: loginSession.emailExpiresAt
+                                        .toDateTime().toUtc(),
                                   ),
                                 ).catchError((err) {
                                   loginFailure();
