@@ -2,9 +2,10 @@ import 'package:dart_blocks/dart_blocks/components/text_field_decoration.dart';
 import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:nuntio_blocks/block_user.pb.dart';
 
-import '../verify_code_sheet/verify_code_sheet.dart';
+import '../VerifyCodeSheet/verify_code_sheet.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({
@@ -233,8 +234,9 @@ class _LoginPageState extends State<LoginPage> {
                             }).then((loginSession) {
                               if (loginSession.loginStatus ==
                                   LoginStatus.EMAIL_IS_NOT_VERIFIED) {
-                                showCupertinoModalPopup(
+                                showCupertinoModalBottomSheet(
                                   context: context,
+                                  useRootNavigator: true,
                                   builder: (context) => VerifyCodeSheet(
                                     buttonHeight: widget.buttonHeight,
                                     buttonWidth: widget.buttonWidth,
@@ -244,7 +246,9 @@ class _LoginPageState extends State<LoginPage> {
                                         .toDateTime().toUtc(),
                                   ),
                                 ).catchError((err) {
+                                  print(err);
                                   loginFailure();
+                                  return err;
                                 }).then((value) {
                                   // login again
                                   NuntioClient.userBlock

@@ -130,7 +130,7 @@ class UserBlock {
 
   Future<dart_blocks.User> create({
     String? userId,
-    String? optionalId,
+    String? username,
     String? email,
     String? image,
     String? password,
@@ -139,7 +139,7 @@ class UserBlock {
     dart_blocks.UserRequest req = dart_blocks.UserRequest();
     dart_blocks.User user = dart_blocks.User();
     user.id = userId ?? "";
-    user.optionalId = optionalId ?? "";
+    user.username = username ?? "";
     user.email = email ?? "";
     user.image = image ?? "";
     user.password = password ?? "";
@@ -162,14 +162,14 @@ class UserBlock {
 
   Future<dart_blocks.User> updateEmail({
     String? userId,
-    String? optionalId,
+    String? username,
     String? currentEmail,
     required String newEmail,
   }) async {
     dart_blocks.UserRequest req = dart_blocks.UserRequest();
     dart_blocks.User get = dart_blocks.User();
     get.id = userId ?? "";
-    get.optionalId = optionalId ?? "";
+    get.username = username ?? "";
     get.email = currentEmail ?? "";
     dart_blocks.User update = dart_blocks.User();
     update.email = newEmail;
@@ -190,14 +190,14 @@ class UserBlock {
 
   Future<dart_blocks.User> updatePassword({
     String? userId,
-    String? optionalId,
+    String? username,
     String? currentEmail,
     required String newPassword,
   }) async {
     dart_blocks.UserRequest req = dart_blocks.UserRequest();
     dart_blocks.User get = dart_blocks.User();
     get.id = userId ?? "";
-    get.optionalId = optionalId ?? "";
+    get.username = username ?? "";
     get.email = currentEmail ?? "";
     dart_blocks.User update = dart_blocks.User();
     update.password = newPassword;
@@ -217,19 +217,21 @@ class UserBlock {
 
   Future<dart_blocks.LoginSession> login({
     String? userId,
-    String? optionalId,
+    String? username,
     String? email,
     required String password,
   }) async {
-    if (userId == null && optionalId == null && email == null) {
+    if ((userId == null || userId == "") &&
+        (username == null || username == "") &&
+        (email == null || email == "")) {
       throw Exception(
-          "missing one required identifier: userId, optionalId or email");
+          "missing one required identifier: userId, username or email");
     }
     String cloudToken = await _authorize.getAccessToken();
     dart_blocks.UserRequest req = dart_blocks.UserRequest();
     dart_blocks.User user = dart_blocks.User();
     user.id = userId ?? "";
-    user.optionalId = optionalId ?? "";
+    user.username = username ?? "";
     user.email = email ?? "";
     user.password = password;
     req.cloudToken = cloudToken;
@@ -298,11 +300,11 @@ class UserBlock {
 
   Future<void> verifyEmailCode({
     String? userId,
-    String? optionalId,
+    String? username,
     String? email,
     required String code,
   }) async {
-    if (userId == null && optionalId == null && email == null) {
+    if (userId == null && username == null && email == null) {
       throw Exception(
           "missing one required identifier: userId, optionalId or email");
     } else if (code == "") {
@@ -312,7 +314,7 @@ class UserBlock {
     dart_blocks.UserRequest req = dart_blocks.UserRequest();
     dart_blocks.User user = dart_blocks.User();
     user.id = userId ?? "";
-    user.optionalId = optionalId ?? "";
+    user.username = username ?? "";
     user.email = email ?? "";
     req.cloudToken = cloudToken;
     req.encryptionKey = _encryptionKey ?? "";
@@ -332,9 +334,7 @@ class UserBlock {
       try {
         var accessToken = await getAccessToken();
         if (accessToken != "" &&
-            JwtDecoder
-                .getRemainingTime(accessToken)
-                .inMinutes > 2) {
+            JwtDecoder.getRemainingTime(accessToken).inMinutes > 2) {
           try {
             if (_jwtPublicKey == "") {
               throw Exception("empty jwt public key");
@@ -363,7 +363,7 @@ class UserBlock {
         _token.refreshToken = await _getRefreshToken();
         req.token = _token;
         dart_blocks.UserResponse refreshResp =
-        await _grpcUserClient.refreshToken(req);
+            await _grpcUserClient.refreshToken(req);
         _setAccessToken(refreshResp.token.accessToken);
         _setRefreshToken(refreshResp.token.refreshToken);
         return true;
@@ -375,6 +375,7 @@ class UserBlock {
     }
     return false;
   }
+
   /*
   Future<void> updateEnableBiometrics({
     String? userId,
@@ -485,12 +486,12 @@ class UserBlock {
   }
    */
 
-  Future<void> recordActiveMeasurement(int seconds, String activeId,
-      String userId) async {
+  Future<void> recordActiveMeasurement(
+      int seconds, String activeId, String userId) async {
     if (seconds > 0 && activeId != "" && userId != "") {
       dart_blocks.UserRequest req = dart_blocks.UserRequest();
       dart_blocks.ActiveMeasurement _activeMeasurement =
-      dart_blocks.ActiveMeasurement();
+          dart_blocks.ActiveMeasurement();
       _activeMeasurement.seconds = seconds;
       _activeMeasurement.id = activeId;
       _activeMeasurement.userId = userId;
@@ -522,7 +523,8 @@ class UserBlock {
   /// Determine the name of the device.
   Future<String?> _getDeviceInfo() async {
     try {
-      if (kIsWeb) {} else {
+      if (kIsWeb) {
+      } else {
         if (WhichPlatform.Platform.isAndroid) {
           return (await _deviceInfoPlugin.androidInfo).host ?? "";
         } else if (WhichPlatform.Platform.isIOS) {
@@ -583,7 +585,7 @@ class UserBlock {
       // continue accessing the position of the device.
       Position position = await Geolocator.getCurrentPosition();
       List<Placemark> placemarks =
-      await placemarkFromCoordinates(position.latitude, position.longitude);
+          await placemarkFromCoordinates(position.latitude, position.longitude);
       _placemark = placemarks.first;
       return placemarks.first;
     } catch (e) {

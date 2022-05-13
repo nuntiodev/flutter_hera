@@ -7,7 +7,7 @@ import '../profile_avatar/profile_avatar.dart';
 class ProfileCard extends StatelessWidget {
   ProfileCard({
     Key? key,
-    required this.width,
+     this.width,
     this.companyLogo,
     this.profileCardDecoration,
     this.image,
@@ -17,7 +17,7 @@ class ProfileCard extends StatelessWidget {
     this.onClick,
   }) : super(key: key);
 
-  final double width;
+  final double? width;
   final Widget? companyLogo;
   final BoxDecoration? profileCardDecoration;
   final String? image;
@@ -64,7 +64,7 @@ class ProfileCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (name != null && name != "")
+                if (name != null && name?.trim() != "")
                   Text(
                     name ?? "",
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -76,11 +76,12 @@ class ProfileCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                     maxLines: 2,
                   ),
-                if (name != null && name != "")
+                if (name != null && name?.trim() != "")
                   SizedBox(
                     height: 5,
                   ),
-                Text(
+                if (email != null && email?.trim() != "")
+                  Text(
                   email ?? "",
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: CupertinoColors.white,
@@ -91,9 +92,10 @@ class ProfileCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   maxLines: 2,
                 ),
-                SizedBox(
-                  height: 5,
-                ),
+                if (email != null && email?.trim() != "")
+                  SizedBox(
+                    height: 5,
+                  ),
                 if (dateTime != null)
                   Text(
                     dateTime?.toLocal().toIso8601String() ?? "",

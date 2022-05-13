@@ -34,4 +34,5 @@ shared_preferences_linux=/Users/oscarorellana/Develop/flutter/.pub-cache/hosted/
 shared_preferences_macos=/Users/oscarorellana/Develop/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_macos-2.0.3/
 shared_preferences_web=/Users/oscarorellana/Develop/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_web-2.0.3/
 shared_preferences_windows=/Users/oscarorellana/Develop/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_windows-2.1.0/
+smart_auth=/Users/oscarorellana/Develop/flutter/.pub-cache/hosted/pub.dartlang.org/smart_auth-1.0.5/
 sqflite=/Users/oscarorellana/Develop/flutter/.pub-cache/hosted/pub.dartlang.org/sqflite-2.0.2+1/

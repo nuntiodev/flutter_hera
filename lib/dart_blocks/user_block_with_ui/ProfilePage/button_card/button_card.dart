@@ -14,29 +14,23 @@ class ButtonCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 65,
-      child: TextButton(
-        style: ElevatedButton.styleFrom(
-          primary: Colors.grey[100],
-          elevation: 0,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
+      child: CupertinoButton(
+        color: Colors.grey[100],
         onPressed: () => onClick(),
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Row(
-            children: [
-              text,
-              const Spacer(),
-              button ?? const Icon(
-                CupertinoIcons.right_chevron,
-                color: CupertinoColors.black,
-                size: 22,
-              ),
-            ],
-          ),
+        padding: EdgeInsets.all(
+          16,
+        ),
+        child: Row(
+          children: [
+            text,
+            const Spacer(),
+            button ??
+                const Icon(
+                  CupertinoIcons.right_chevron,
+                  color: CupertinoColors.black,
+                  size: 22,
+                ),
+          ],
         ),
       ),
     );

@@ -480,6 +480,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  modal_bottom_sheet:
+    dependency: "direct main"
+    description:
+      name: modal_bottom_sheet
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   nm:
     dependency: transitive
     description:
@@ -500,7 +507,7 @@ packages:
       name: nuntio_blocks
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.19"
+    version: "0.0.20"
   nuntio_cloud:
     dependency: "direct main"
     description:
@@ -592,13 +599,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.4.0"
-  pin_code_fields:
+  pinput:
     dependency: "direct main"
     description:
-      name: pin_code_fields
+      name: pinput
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "7.4.0"
+    version: "2.2.8"
   platform:
     dependency: transitive
     description:
@@ -744,6 +751,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  smart_auth:
+    dependency: transitive
+    description:
+      name: smart_auth
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.5"
   source_map_stack_trace:
     dependency: transitive
     description:

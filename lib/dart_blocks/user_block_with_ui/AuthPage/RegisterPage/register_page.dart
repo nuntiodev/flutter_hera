@@ -1,10 +1,11 @@
 import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:nuntio_blocks/block_user.pbenum.dart';
 
 import '../../../components/text_field_decoration.dart';
-import '../verify_code_sheet/verify_code_sheet.dart';
+import '../VerifyCodeSheet/verify_code_sheet.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({
@@ -465,8 +466,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                   .then((loginSession) {
                                 if (loginSession.loginStatus ==
                                     LoginStatus.EMAIL_IS_NOT_VERIFIED) {
-                                  showCupertinoModalPopup(
+                                  showCupertinoModalBottomSheet(
                                     context: context,
+                                    useRootNavigator: true,
                                     builder: (context) => VerifyCodeSheet(
                                       buttonHeight: widget.buttonHeight,
                                       buttonWidth: widget.buttonWidth,
@@ -477,7 +479,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                           .toDateTime().toUtc(),
                                     ),
                                   ).catchError((err) {
+                                    print(err);
                                     afterLoginFailure();
+                                    return err;
                                     //todo show error message with user created;
                                   }).then((value) {
                                     // login again

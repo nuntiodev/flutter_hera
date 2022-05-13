@@ -1,6 +1,4 @@
-import 'package:dart_blocks/dart_blocks/models/biometric_data.dart';
 import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
-import 'package:dart_blocks/dart_blocks/user_block_with_ui/ProfilePage/profile_avatar/profile_avatar.dart';
 import 'package:dart_blocks/dart_blocks/user_block_with_ui/ProfilePage/profile_card/profile_card.dart';
 import 'package:dart_blocks/dart_blocks/user_block_with_ui/ProfilePage/update_email_dialog/update_email_dialog.dart';
 import 'package:dart_blocks/dart_blocks/user_block_with_ui/ProfilePage/update_password_dialog/update_password_dialog.dart';
@@ -23,7 +21,6 @@ class UserProfile extends StatefulWidget {
     required this.newEmailHint,
     required this.changePasswordDescription,
     required this.newPasswordHint,
-    required this.updateBioMetricsText,
     required this.companyLogo,
     this.child,
     this.profileCardDecoration,
@@ -38,7 +35,6 @@ class UserProfile extends StatefulWidget {
   final String newEmailHint;
   final Widget logoutText;
   final Widget companyLogo;
-  final Widget updateBioMetricsText;
   final Function onLogout;
   final Widget? child;
   final BoxDecoration? profileCardDecoration;
@@ -52,7 +48,6 @@ class _UserProfileState extends State<UserProfile> {
 
   TextEditingController passwordController = TextEditingController();
 
-  late bool enableBiometricLogin;
   bool isLoading = false;
 
   Future<User> initializeProfile() async {
@@ -77,7 +72,7 @@ class _UserProfileState extends State<UserProfile> {
           case ConnectionState.done:
             return SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
+                padding: const EdgeInsets.only(left: 14, right: 14),
                 child: Column(
                   children: [
                     const SizedBox(
@@ -88,7 +83,6 @@ class _UserProfileState extends State<UserProfile> {
                       height: 20,
                     ),
                     ProfileCard(
-                      width: 400,
                       companyLogo: widget.companyLogo,
                       profileCardDecoration: widget.profileCardDecoration,
                       image: snapshot.data?.image,
@@ -155,9 +149,6 @@ class _UserProfileState extends State<UserProfile> {
                         );
                       },
                       text: widget.changePasswordText,
-                    ),
-                    const SizedBox(
-                      height: 10,
                     ),
                     const SizedBox(
                       height: 10,
