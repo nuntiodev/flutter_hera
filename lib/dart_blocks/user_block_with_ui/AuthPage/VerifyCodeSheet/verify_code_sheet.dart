@@ -108,7 +108,7 @@ class _VerifyCodeSheetState extends State<VerifyCodeSheet> {
             if (_hasError)
               Text(
                 "Something went wrong. Please try again and make sure your code is valid.",
-                style: TextStyle(color: CupertinoColors.systemRed),
+                style: Theme.of(context).textTheme.bodyText1
               ),
             if (_hasError)
               SizedBox(

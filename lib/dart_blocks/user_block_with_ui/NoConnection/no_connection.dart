@@ -1,26 +1,25 @@
 import 'package:dart_blocks/dart_blocks/models/auth.dart';
 import 'package:dart_blocks/dart_blocks/user_block_with_ui/AuthPage/LoginPage/login_page.dart';
 import 'package:dart_blocks/dart_blocks/user_block_with_ui/AuthPage/RegisterPage/register_page.dart';
+import 'package:dart_blocks/dart_blocks/user_block_with_ui/models.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class NoConnection extends StatelessWidget {
   NoConnection({
     Key? key,
-    required this.createdBy,
-    required this.title,
-    required this.details,
     required this.logo,
     required this.background,
-    required this.primaryColor,
+    required this.nuntioText,
+    required this.nuntioTextStyle,
+    required this.nuntioColor,
   });
 
-  final Widget createdBy;
   final BoxDecoration background;
   final Widget logo;
-  final Widget title;
-  final Widget details;
-  final Color primaryColor;
+  final NuntioText nuntioText;
+  final NuntioTextStyle nuntioTextStyle;
+  final NuntioColor nuntioColor;
 
   @override
   Widget build(BuildContext context) {
@@ -40,15 +39,20 @@ class NoConnection extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                title,
+                Text(
+                  nuntioText.noWifiTitle,
+                  style: nuntioTextStyle.titleStyle,
+                ),
                 const SizedBox(
                   height: 15,
                 ),
-                details,
+                Text(
+                  nuntioText.noWifiDescription,
+                  style: nuntioTextStyle.descriptionStyle,
+                ),
                 const Spacer(),
                 SizedBox(),
                 Spacer(),
-                createdBy,
               ],
             ),
           ),

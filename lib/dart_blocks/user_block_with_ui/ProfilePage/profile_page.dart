@@ -12,7 +12,6 @@ import 'button_card/button_card.dart';
 class UserProfile extends StatefulWidget {
   UserProfile({
     Key? key,
-    required this.profileTitle,
     required this.changePasswordText,
     required this.changeEmailText,
     required this.logoutText,
@@ -26,7 +25,6 @@ class UserProfile extends StatefulWidget {
     this.profileCardDecoration,
   }) : super(key: key);
 
-  final Widget profileTitle;
   final Widget changePasswordText;
   final Widget changePasswordDescription;
   final Widget changeEmailText;
@@ -75,10 +73,6 @@ class _UserProfileState extends State<UserProfile> {
                 padding: const EdgeInsets.only(left: 14, right: 14),
                 child: Column(
                   children: [
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    widget.profileTitle,
                     const SizedBox(
                       height: 20,
                     ),

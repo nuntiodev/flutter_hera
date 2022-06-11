@@ -2,82 +2,39 @@ import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:nuntio_blocks/block_user.pbenum.dart';
-
+import 'package:nuntio_blocks/block_user.pb.dart';
 import '../../../components/text_field_decoration.dart';
+import '../../models.dart';
 import '../VerifyCodeSheet/verify_code_sheet.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({
     Key? key,
+    required this.nuntioStyle,
+    required this.nuntioText,
+    required this.nuntioColor,
+    required this.nuntioTextStyle,
     required this.logo,
-    required this.title,
-    required this.buttonText,
-    required this.emailHint,
-    required this.passwordHint,
-    required this.details,
-    required this.onRegister,
-    required this.createdBy,
-    required this.secondaryColor,
-    required this.repeatPasswordHint,
+    required this.config,
     required this.background,
-    required this.primaryColor,
-    required this.textFieldBorder,
-    required this.textFieldColor,
-    required this.validatePassword,
-    required this.missingEmailTitle,
-    required this.missingEmailDetails,
-    required this.missingPasswordTitle,
-    required this.missingPasswordDetails,
-    required this.invalidTitle,
-    required this.invalidDetails,
-    required this.passwordDoNotMatchTitle,
-    required this.passwordDoNotMatchDetails,
-    required this.errorColor,
-    required this.successColor,
-    required this.containsEightCharactersText,
-    required this.containsNumberText,
-    required this.containsSpecialText,
-    required this.passwordMatchText,
-    required this.buttonHeight,
-    required this.buttonWidth,
-    required this.arrowBackColor,
-    required this.verifyCodeTitle,
+    required this.onRegister,
   }) : super(key: key);
 
-  final double buttonHeight;
-  final double buttonWidth;
-  final bool validatePassword;
-  final Widget buttonText;
-  final BoxDecoration background;
-  final Color secondaryColor;
-  final Color primaryColor;
-  final Color errorColor;
-  final Color successColor;
-  final Widget title;
+  // style and text config
+  final NuntioStyle nuntioStyle;
+  final NuntioText nuntioText;
+  final NuntioColor nuntioColor;
+  final NuntioTextStyle nuntioTextStyle;
+
+  // general
   final Widget logo;
-  final Widget createdBy;
-  final String emailHint;
-  final String passwordHint;
-  final String repeatPasswordHint;
-  final Widget details;
+  final Config config;
+
+  // style
+  final BoxDecoration background;
+
+  // functions
   final Function onRegister;
-  final Border textFieldBorder;
-  final Color textFieldColor;
-  final String missingEmailTitle;
-  final String missingEmailDetails;
-  final String missingPasswordTitle;
-  final String missingPasswordDetails;
-  final String invalidTitle;
-  final String invalidDetails;
-  final String passwordDoNotMatchTitle;
-  final String passwordDoNotMatchDetails;
-  final Widget containsEightCharactersText;
-  final Widget containsSpecialText;
-  final Widget containsNumberText;
-  final Widget passwordMatchText;
-  final Color arrowBackColor;
-  final Widget verifyCodeTitle;
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -96,7 +53,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool passwordMatch = false;
 
   onPasswordChange() {
-    if (!widget.validatePassword) {
+    if (!widget.config.validatePassword) {
       return;
     }
     if (passwordController.text != "") {
@@ -184,36 +141,38 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       resizeToAvoidBottomInset: false,
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: Colors.transparent,
-        border: null,
-        middle: widget.title,
-        leading: CupertinoButton(
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: widget.arrowBackColor,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
       child: Container(
         decoration: widget.background,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                flex: 5,
-                child: Align(
-                  alignment: Alignment.center,
+        height: MediaQuery.of(context).size.height,
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              child: Container(
+                constraints: BoxConstraints(maxWidth: 400),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 20, right: 20, bottom: 20, top: 0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
+                      widget.logo,
                       SizedBox(
-                        height: 30,
+                        height: 20,
                       ),
-                      widget.details,
+                      Text(
+                        widget.nuntioText.registerTitle,
+                        style: widget.nuntioTextStyle.titleStyle,
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        widget.nuntioText.registerDetails,
+                        style: widget.nuntioTextStyle.descriptionStyle,
+                        textAlign: TextAlign.center,
+                      ),
                       SizedBox(
                         height: 30,
                       ),
@@ -221,9 +180,11 @@ class _RegisterPageState extends State<RegisterPage> {
                         height: 40,
                         child: CupertinoTextField(
                           decoration: textFieldDecoration(
-                              widget.textFieldBorder, widget.textFieldColor),
+                            widget.nuntioStyle.border,
+                            widget.nuntioStyle.borderColor,
+                          ),
                           controller: emailController,
-                          placeholder: widget.emailHint,
+                          placeholder: widget.nuntioText.identifierHint,
                           keyboardType: TextInputType.emailAddress,
                         ),
                       ),
@@ -234,11 +195,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         height: 40,
                         child: CupertinoTextField(
                           decoration: textFieldDecoration(
-                              widget.textFieldBorder, widget.textFieldColor),
+                            widget.nuntioStyle.border,
+                            widget.nuntioStyle.borderColor,
+                          ),
                           controller: passwordController,
                           onChanged: (_) => onPasswordChange(),
                           obscureText: true,
-                          placeholder: widget.passwordHint,
+                          placeholder: widget.nuntioText.passwordHint,
                           keyboardType: TextInputType.text,
                           maxLength: 80,
                         ),
@@ -250,16 +213,18 @@ class _RegisterPageState extends State<RegisterPage> {
                         height: 40,
                         child: CupertinoTextField(
                           decoration: textFieldDecoration(
-                              widget.textFieldBorder, widget.textFieldColor),
+                            widget.nuntioStyle.border,
+                            widget.nuntioStyle.borderColor,
+                          ),
                           controller: repeatPasswordController,
                           onChanged: (_) => onPasswordChange(),
                           obscureText: true,
-                          placeholder: widget.repeatPasswordHint,
+                          placeholder: widget.nuntioText.repeatPasswordHint,
                           keyboardType: TextInputType.text,
                           maxLength: 80,
                         ),
                       ),
-                      if (widget.validatePassword)
+                      if (widget.config.validatePassword)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -275,14 +240,18 @@ class _RegisterPageState extends State<RegisterPage> {
                                       ? CupertinoIcons.check_mark_circled
                                       : CupertinoIcons.xmark_circle,
                                   color: containsEightCharacters
-                                      ? widget.successColor
-                                      : widget.errorColor,
+                                      ? widget.nuntioColor.successColor
+                                      : widget.nuntioColor.errorColor,
                                   size: 15,
                                 ),
                                 SizedBox(
                                   width: 5,
                                 ),
-                                widget.containsEightCharactersText,
+                                Text(
+                                  widget.nuntioText
+                                      .passwordContainsEightCharsHint,
+                                  style: widget.nuntioTextStyle.bodyTextStyle,
+                                )
                               ],
                             ),
                             SizedBox(
@@ -296,14 +265,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                       ? CupertinoIcons.check_mark_circled
                                       : CupertinoIcons.xmark_circle,
                                   color: containsNumber
-                                      ? widget.successColor
-                                      : widget.errorColor,
+                                      ? widget.nuntioColor.successColor
+                                      : widget.nuntioColor.errorColor,
                                   size: 15,
                                 ),
                                 SizedBox(
                                   width: 5,
                                 ),
-                                widget.containsNumberText
+                                Text(
+                                  widget.nuntioText.passwordContainsNumberHint,
+                                  style: widget.nuntioTextStyle.bodyTextStyle,
+                                )
                               ],
                             ),
                             SizedBox(
@@ -317,14 +289,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                       ? CupertinoIcons.check_mark_circled
                                       : CupertinoIcons.xmark_circle,
                                   color: containsSpecial
-                                      ? widget.successColor
-                                      : widget.errorColor,
+                                      ? widget.nuntioColor.successColor
+                                      : widget.nuntioColor.errorColor,
                                   size: 15,
                                 ),
                                 SizedBox(
                                   width: 5,
                                 ),
-                                widget.containsSpecialText,
+                                Text(
+                                  widget.nuntioText.passwordContainsSpecialHint,
+                                  style: widget.nuntioTextStyle.bodyTextStyle,
+                                )
                               ],
                             ),
                             SizedBox(
@@ -338,14 +313,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                       ? CupertinoIcons.check_mark_circled
                                       : CupertinoIcons.xmark_circle,
                                   color: passwordMatch
-                                      ? widget.successColor
-                                      : widget.errorColor,
+                                      ? widget.nuntioColor.successColor
+                                      : widget.nuntioColor.errorColor,
                                   size: 15,
                                 ),
                                 SizedBox(
                                   width: 5,
                                 ),
-                                widget.passwordMatchText,
+                                Text(
+                                  widget.nuntioText.passwordsMustMatchHint,
+                                  style: widget.nuntioTextStyle.bodyTextStyle,
+                                )
                               ],
                             ),
                           ],
@@ -354,171 +332,205 @@ class _RegisterPageState extends State<RegisterPage> {
                         height: 30,
                       ),
                       SizedBox(
-                        width: widget.buttonWidth,
-                        height: widget.buttonHeight,
+                        width: widget.nuntioStyle.buttonWidth,
+                        height: widget.nuntioStyle.buttonHeight,
                         child: CupertinoButton(
-                          color: widget.secondaryColor,
-                          onPressed: () {
-                            if (!passwordMatch ||
-                                !containsSpecial ||
-                                !containsNumber ||
-                                !containsEightCharacters) {
-                              return;
-                            }
-                            if (emailController.text.isEmpty) {
-                              showCupertinoDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return CupertinoAlertDialog(
-                                      title: Text(widget.missingEmailTitle),
-                                      content:
-                                          Text(widget.missingPasswordDetails),
-                                      actions: <Widget>[
-                                        TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: const Text('okay'))
-                                      ],
-                                    );
-                                  });
-                              return;
-                            } else if (passwordController.text.isEmpty) {
-                              showCupertinoDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return CupertinoAlertDialog(
-                                      title: Text(widget.missingPasswordTitle),
-                                      content:
-                                          Text(widget.missingPasswordDetails),
-                                      actions: <Widget>[
-                                        TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: const Text('okay'))
-                                      ],
-                                    );
-                                  });
-                              return;
-                            } else if (passwordController.text !=
-                                repeatPasswordController.text) {
-                              showCupertinoDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return CupertinoAlertDialog(
-                                      title:
-                                          Text(widget.passwordDoNotMatchTitle),
-                                      content: Text(
-                                          widget.passwordDoNotMatchDetails),
-                                      actions: <Widget>[
-                                        TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: const Text('okay'))
-                                      ],
-                                    );
-                                  });
-                              return;
-                            }
-                            setState(() {
-                              isLoading = true;
-                            });
-                            NuntioClient.userBlock
-                                .create(
-                              password: passwordController.text,
-                              email: emailController.text,
-                            )
-                                .catchError((err) {
-                              passwordController.text = "";
-                              emailController.text = "";
-                              repeatPasswordController.text = "";
-                              setState(() {
-                                isLoading = false;
-                                containsEightCharacters = false;
-                                containsNumber = false;
-                                containsSpecial = false;
-                                passwordMatch = false;
-                              });
-                              showCupertinoDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return CupertinoAlertDialog(
-                                      title: Text(widget.invalidTitle),
-                                      content: Text(widget.invalidDetails),
-                                      actions: <Widget>[
-                                        TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: const Text('okay'))
-                                      ],
-                                    );
-                                  });
-                              return err;
-                            }).then((user) {
-                              // todo: handle error
-                              NuntioClient.userBlock
-                                  .login(
-                                      password: passwordController.text,
-                                      email: emailController.text)
-                                  .then((loginSession) {
-                                if (loginSession.loginStatus ==
-                                    LoginStatus.EMAIL_IS_NOT_VERIFIED) {
-                                  showCupertinoModalBottomSheet(
+                            color: widget.nuntioColor.secondaryColor,
+                            onPressed: () {
+                              if (!passwordMatch ||
+                                  !containsSpecial ||
+                                  !containsNumber ||
+                                  !containsEightCharacters) {
+                                return;
+                              }
+                              if (emailController.text.isEmpty) {
+                                showCupertinoDialog(
                                     context: context,
-                                    useRootNavigator: true,
-                                    builder: (context) => VerifyCodeSheet(
-                                      buttonHeight: widget.buttonHeight,
-                                      buttonWidth: widget.buttonWidth,
-                                      verifyCodeTitle: widget.verifyCodeTitle,
-                                      userEmail: emailController.text,
-                                      emailExpiresAt: loginSession
-                                          .emailExpiresAt
-                                          .toDateTime().toUtc(),
-                                    ),
-                                  ).catchError((err) {
-                                    print(err);
-                                    afterLoginFailure();
-                                    return err;
-                                    //todo show error message with user created;
-                                  }).then((value) {
-                                    // login again
-                                    NuntioClient.userBlock
-                                        .login(
-                                            password: passwordController.text,
-                                            email: emailController.text)
-                                        .catchError((err) {
-                                      afterLoginFailure();
-                                      //todo: show error message with user created;
-                                    }).then((value) {
-                                      afterLoginSuccess();
+                                    builder: (context) {
+                                      return CupertinoAlertDialog(
+                                        title: Text(
+                                          widget.nuntioText
+                                              .missingIdentifierTitle,
+                                        ),
+                                        content: Text(
+                                          widget.nuntioText
+                                              .missingIdentifierDescription,
+                                        ),
+                                        actions: <Widget>[
+                                          CupertinoButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text('okay'))
+                                        ],
+                                      );
                                     });
-                                  });
-                                } else {
-                                  afterLoginSuccess();
-                                }
+                                return;
+                              } else if (passwordController.text.isEmpty) {
+                                showCupertinoDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return CupertinoAlertDialog(
+                                        title: Text(
+                                          widget
+                                              .nuntioText.missingPasswordTitle,
+                                          style:
+                                              widget.nuntioTextStyle.titleStyle,
+                                        ),
+                                        content: Text(
+                                          widget.nuntioText
+                                              .missingPasswordDescription,
+                                        ),
+                                        actions: <Widget>[
+                                          CupertinoButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text('okay'))
+                                        ],
+                                      );
+                                    });
+                                return;
+                              } else if (passwordController.text !=
+                                  repeatPasswordController.text) {
+                                showCupertinoDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return CupertinoAlertDialog(
+                                        title: Text(
+                                          widget.nuntioText
+                                              .passwordDoNotMatchTitle,
+                                        ),
+                                        content: Text(
+                                          widget.nuntioText
+                                              .passwordDoNotMatchDescription,
+                                        ),
+                                        actions: <Widget>[
+                                          CupertinoButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text('okay'))
+                                        ],
+                                      );
+                                    });
+                                return;
+                              }
+                              setState(() {
+                                isLoading = true;
                               });
-                            });
-                          },
-                          child: isLoading
-                              ? CupertinoActivityIndicator()
-                              : widget.buttonText,
-                        ),
+                              NuntioClient.userBlock
+                                  .create(
+                                password: passwordController.text,
+                                email: emailController.text,
+                              )
+                                  .catchError((err) {
+                                passwordController.text = "";
+                                emailController.text = "";
+                                repeatPasswordController.text = "";
+                                setState(() {
+                                  isLoading = false;
+                                  containsEightCharacters = false;
+                                  containsNumber = false;
+                                  containsSpecial = false;
+                                  passwordMatch = false;
+                                });
+                                showCupertinoDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return CupertinoAlertDialog(
+                                        title: Text(
+                                          widget.nuntioText.errorTitle,
+                                        ),
+                                        content: Text(
+                                          widget.nuntioText.errorDescription,
+                                        ),
+                                        actions: <Widget>[
+                                          CupertinoButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text('okay'))
+                                        ],
+                                      );
+                                    });
+                                return err;
+                              }).then((user) {
+                                // todo: handle error
+                                NuntioClient.userBlock
+                                    .login(
+                                        password: passwordController.text,
+                                        email: emailController.text)
+                                    .then((loginSession) {
+                                  if (loginSession.loginStatus ==
+                                      LoginStatus.EMAIL_IS_NOT_VERIFIED) {
+                                    showCupertinoModalBottomSheet(
+                                      context: context,
+                                      useRootNavigator: true,
+                                      builder: (context) => VerifyCodeSheet(
+                                        buttonWidth:
+                                            widget.nuntioStyle.buttonWidth,
+                                        buttonHeight:
+                                            widget.nuntioStyle.buttonHeight,
+                                        verifyCodeTitle: Text(
+                                          widget
+                                              .nuntioText.verificationCodeTitle,
+                                          style:
+                                              widget.nuntioTextStyle.titleStyle,
+                                        ),
+                                        userEmail: emailController.text,
+                                        emailExpiresAt: loginSession
+                                            .emailExpiresAt
+                                            .toDateTime()
+                                            .toUtc(),
+                                      ),
+                                    ).catchError((err) {
+                                      print(err);
+                                      afterLoginFailure();
+                                      return err;
+                                      //todo show error message with user created;
+                                    }).then((value) {
+                                      // login again
+                                      NuntioClient.userBlock
+                                          .login(
+                                              password: passwordController.text,
+                                              email: emailController.text)
+                                          .catchError((err) {
+                                        afterLoginFailure();
+                                        //todo: show error message with user created;
+                                      }).then((value) {
+                                        afterLoginSuccess();
+                                      });
+                                    });
+                                  } else {
+                                    afterLoginSuccess();
+                                  }
+                                });
+                              });
+                            },
+                            child: isLoading
+                                ? CupertinoActivityIndicator()
+                                : Text(
+                                    widget.nuntioText.registerButton,
+                                    style: widget.nuntioTextStyle
+                                        .registerButtonTextStyle,
+                                  )),
                       ),
+                      CupertinoButton(
+                          child: Text(
+                            widget.nuntioText.alreadyHaveAccountDescription,
+                            style: TextStyle(
+                              color: widget.nuntioColor.primaryColor,
+                            ),
+                          ),
+                          onPressed: () => {
+                                Navigator.of(context).pop(),
+                              }),
                     ],
                   ),
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: widget.createdBy,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

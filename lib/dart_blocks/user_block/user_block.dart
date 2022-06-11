@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' as WhichPlatform;
 import 'package:biometric_storage/biometric_storage.dart';
-import 'package:dart_blocks/dart_blocks/models/biometric_data.dart';
 import 'package:dart_blocks/nuntio_authorize/nuntio_authorize.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/foundation.dart';
@@ -14,8 +13,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const String biometricsNotEnabled =
-    "Cannot read from biometric storage. Checkout: https://pub.dev/packages/biometric_storage.";
 
 class UserBlock {
   UserBlock({
@@ -376,115 +373,6 @@ class UserBlock {
     return false;
   }
 
-  /*
-  Future<void> updateEnableBiometrics({
-    String? userId,
-    String? optionalId,
-    String? email,
-    required bool enableBiometrics,
-  }) async {
-    try {
-      if (biometricStorage != null &&
-          await BiometricStorage().canAuthenticate() ==
-              CanAuthenticateResponse.success) {
-        // get previous biometric accounts and add current
-        List<BiometricUser> _biometricUsers = <BiometricUser>[];
-        try {
-          _biometricUsers = await getBiometricUsers();
-        } catch (e) {
-          print("Could not get biometric users with err: " + e.toString());
-        }
-        // get id
-        String id = userId ?? optionalId ?? email ?? "";
-        if (enableBiometrics) {
-          if (_biometricUsers
-              .where((element) => element.id == id)
-              .isEmpty) {
-            // does not exist --> add
-            BiometricUser _newBiometricUser = BiometricUser(
-              accessToken: _accessToken,
-              refreshToken: _refreshToken,
-            );
-            // add to biometric storage
-            (await biometricStorage?.getStorage(id))
-                ?.write(jsonEncode(_newBiometricUser.toJson()));
-            // add to shared preferences
-            BiometricUser _newSharedUser =
-            BiometricUser(id: id, image: (await getCurrentUser()).image);
-            _biometricUsers.add(_newSharedUser);
-            await sharedPreferences.setStringList(
-                _savedBiometricUsersKey,
-                _biometricUsers
-                    .map((e) => e.id ?? "")
-                    .where((e) => e != "")
-                    .toList());
-            // set image
-            await sharedPreferences.setString(id, _currentUser.image);
-          }
-        } else {
-          if (_biometricUsers
-              .where((element) => element.id == id)
-              .isNotEmpty) {
-            (await biometricStorage?.getStorage(id))?.delete();
-            _biometricUsers.removeWhere((element) => element.id == id);
-            await sharedPreferences.setStringList(
-                _savedBiometricUsersKey,
-                _biometricUsers
-                    .map((e) => e.id ?? "")
-                    .where((e) => e != "")
-                    .toList());
-            await sharedPreferences.remove(id);
-          }
-        }
-        _setCurrentUser(_currentUser..enableBiometrics = enableBiometrics);
-      } else {
-        throw Exception(biometricsNotEnabled);
-      }
-    } catch (e) {
-      if (debug == true)
-        print("could not update user biometrics with err: " + e.toString());
-      rethrow;
-    }
-  }
-   */
-
-  /*
-  Future<void> loginFromBiometrics(String id) async {
-    if (biometricStorage != null &&
-        await BiometricStorage().canAuthenticate() ==
-            CanAuthenticateResponse.success) {
-      // get previous biometric accounts and add current
-      BiometricUsers _biometricData = await getBiometricUsers();
-      if (_biometricData.refreshToken != null &&
-          _biometricData.refreshToken?[id] != "") {
-        String cloudToken = await _authorize.getAccessToken();
-        dart_blocks.UserRequest req = dart_blocks.UserRequest();
-        req.cloudToken = cloudToken;
-        req.encryptionKey = _encryptionKey ?? "";
-        req.token = dart_blocks.Token()..refreshToken = _refreshToken;
-        // get valid token pair
-        dart_blocks.UserResponse resp = await _grpcUserClient.refreshToken(req);
-        _setAccessToken(resp.token.accessToken);
-        _setRefreshToken(resp.token.refreshToken);
-        // get current user from token
-        req.tokenPointer = _accessToken;
-        _currentUser = (await _grpcUserClient.validateToken(req)).user;
-      } else {
-        throw Exception("biometric data is not valid");
-      }
-    } else {
-      throw Exception(biometricsNotEnabled);
-    }
-  }
-   */
-  /*
-  Future<List<BiometricUser>> getBiometricUsers() async {
-    List<String> _biometricUsers =
-        (sharedPreferences.getStringList(_savedBiometricUsersKey)) ?? [];
-    return _biometricUsers.map((id) =>
-        BiometricUser(id: id, image: sharedPreferences.getString(id) ?? "")).toList();
-  }
-   */
 
   Future<void> recordActiveMeasurement(
       int seconds, String activeId, String userId) async {
@@ -514,16 +402,17 @@ class UserBlock {
     }
   }
 
-  Future<dart_blocks.Config> getConfiguration() async {
+  Future<dart_blocks.Config> initializeApplication() async {
     dart_blocks.UserRequest req = dart_blocks.UserRequest();
     req.cloudToken = await _authorize.getAccessToken();
-    return (await _grpcUserClient.getConfig(req)).config;
+    return (await _grpcUserClient.initializeApplication(req)).config;
   }
 
   /// Determine the name of the device.
   Future<String?> _getDeviceInfo() async {
     try {
       if (kIsWeb) {
+        return "Web";
       } else {
         if (WhichPlatform.Platform.isAndroid) {
           return (await _deviceInfoPlugin.androidInfo).host ?? "";
@@ -545,10 +434,12 @@ class UserBlock {
   }
 
   /// Determine the current position of the device.
-  ///
   /// When the location services are not enabled or permissions
   /// are denied the `Future` will return an error.
   Future<Placemark?> _determinePlacemark() async {
+    if(kIsWeb){
+      return null;
+    }
     try {
       bool serviceEnabled;
       LocationPermission permission;

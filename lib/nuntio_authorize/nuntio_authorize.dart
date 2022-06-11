@@ -1,4 +1,4 @@
-import 'package:nuntio_cloud/cloud_project.pbgrpc.dart';
+import 'package:nuntio_cloud/cloud.pbgrpc.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 abstract class Authorize {
@@ -7,7 +7,7 @@ abstract class Authorize {
 
 class NuntioAuthorize implements Authorize {
   // _grpcProjectClient is an object to communicate with the dart_blocks
-  late final ProjectServiceClient _grpcProjectClient;
+  late final CloudServiceClient _grpcCloudClient;
 
   // _apiKey used to authorize requests
   String _apiKey = "";
@@ -16,8 +16,8 @@ class NuntioAuthorize implements Authorize {
   String _accessToken = "";
 
   NuntioAuthorize(
-      {required ProjectServiceClient projectClient, required String apiKey}) {
-    _grpcProjectClient = projectClient;
+      {required CloudServiceClient projectClient, required String apiKey}) {
+    _grpcCloudClient = projectClient;
     _apiKey = apiKey;
   }
 
@@ -35,9 +35,9 @@ class NuntioAuthorize implements Authorize {
       }
     }
     try {
-      ProjectRequest req = ProjectRequest();
+      CloudRequest req = CloudRequest();
       req.privateKey = _apiKey;
-      ProjectResponse resp = await _grpcProjectClient.generateAccessToken(req);
+      CloudResponse resp = await _grpcCloudClient.generateAccessToken(req);
       _accessToken = resp.accessToken;
       return _accessToken;
     } catch (e) {

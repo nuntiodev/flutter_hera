@@ -4,10 +4,11 @@ import 'package:biometric_storage/biometric_storage.dart';
 import 'package:dart_blocks/dart_blocks/user_block/user_block.dart';
 import 'package:dart_blocks/nuntio_authorize/nuntio_authorize.dart';
 import 'package:dart_blocks/nuntio_credentials/nuntio_credentials.dart';
-import 'package:nuntio_cloud/cloud_project.pbgrpc.dart';
-import 'package:grpc/grpc.dart';
+import 'package:nuntio_cloud/cloud.pbgrpc.dart';
 import 'package:nuntio_blocks/block_user.pbgrpc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dart_blocks/dart_blocks/channel/user_channel.dart'
+    if (dart.library.html) 'package:dart_blocks/dart_blocks/channel/user_channel_web.dart';
 
 class NuntioClient {
   // _encryptionKey  is used to encrypt clients data under the given key
@@ -25,8 +26,8 @@ class NuntioClient {
   // _grpcUserClient is an object to communicate with the dart_blocks
   static late UserServiceClient _grpcUserClient;
 
-  // _grpcUserClient is an object to communicate with the dart_blocks
-  static late ProjectServiceClient _grpcProjectClient;
+  // _grpcCloudClient is an object to communicate with the api server
+  static late CloudServiceClient _grpcCloudClient;
 
   // userClient is used to make requests
   static late UserBlock userBlock;
@@ -45,24 +46,11 @@ class NuntioClient {
     _apiKey = apiKey ?? "";
     _namespace = namespace ?? "";
     _apiUrl = apiUrl ?? _apiUrl;
-    // build uri
-    Uri apiUri = Uri.parse(_apiUrl);
-    // build channel
-    transportCredentials ??= NuntioCredentials(
-      apiUrl: apiUri,
-    );
-    ChannelCredentials channelCredentials =
-        await transportCredentials.getTransportCredentials();
-    ClientChannel apiChannel = ClientChannel(
-      apiUri.host,
-      port: apiUri.port,
-      options: ChannelOptions(credentials: channelCredentials),
-    );
-    _grpcUserClient = UserServiceClient(apiChannel);
-    _grpcProjectClient = ProjectServiceClient(apiChannel);
+    _grpcUserClient = await NuntioChannel.userServiceClient(_apiUrl);
+    _grpcCloudClient = await NuntioChannel.cloudServiceClient(_apiUrl);
     // build authorize
     Authorize authorize =
-        NuntioAuthorize(projectClient: _grpcProjectClient, apiKey: _apiKey);
+        NuntioAuthorize(projectClient: _grpcCloudClient, apiKey: _apiKey);
     // get block user public key
     UserRequest publicKeysReq = UserRequest();
     publicKeysReq.cloudToken = await authorize.getAccessToken();
