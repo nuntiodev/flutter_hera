@@ -113,7 +113,8 @@ class NuntioText {
     this.forgotPasswordDetails = forgotPasswordDetails ?? "Forgot password?";
     this.verificationCodeTitle =
         verificationCodeTitle ?? "Enter provided verification code";
-    this.alreadyHaveAccountDescription = alreadyHaveAccountDescription ?? "Already have an account?";
+    this.alreadyHaveAccountDescription =
+        alreadyHaveAccountDescription ?? "Already have an account?";
   }
 }
 
@@ -185,12 +186,14 @@ class NuntioStyle {
   late Color borderColor;
   late double buttonWidth;
   late double buttonHeight;
+  late double logoWidth;
 
   NuntioStyle({
     Border? border,
     Color? borderColor,
     double? buttonWidth,
     double? buttonHeight,
+    double? logoWidth,
   }) {
     this.border = border ??
         Border.all(
@@ -200,5 +203,16 @@ class NuntioStyle {
     this.borderColor = borderColor ?? CupertinoColors.white;
     this.buttonWidth = buttonWidth ?? 250;
     this.buttonHeight = buttonHeight ?? 55;
+    this.logoWidth = logoWidth ?? 150;
+  }
+}
+
+class NuntioFooter {
+  late Widget footer;
+  late double height;
+
+  NuntioFooter({Widget? footer, double? height}) {
+    this.footer = footer ?? SizedBox();
+    this.height = height ?? 0.0;
   }
 }

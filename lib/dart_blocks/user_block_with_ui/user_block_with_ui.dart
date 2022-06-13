@@ -12,14 +12,14 @@ import 'package:nuntio_blocks/block_user.pb.dart';
 class UserBlockWithUI extends StatefulWidget {
   UserBlockWithUI({
     Key? key,
-    required this.child,
     required BuildContext context,
+    required this.onRegister,
+    required this.onLogin,
     NuntioText? nuntioText,
     NuntioColor? nuntioColor,
     NuntioTextStyle? nuntioTextStyle,
     NuntioStyle? nuntioStyle,
-    this.onRegister,
-    this.onLogin,
+    NuntioFooter? nuntioFooter,
     this.logo,
     this.background,
   }) {
@@ -27,6 +27,7 @@ class UserBlockWithUI extends StatefulWidget {
     this.nuntioText = nuntioText ?? NuntioText();
     this.nuntioColor = nuntioColor ?? NuntioColor();
     this.nuntioTextStyle = nuntioTextStyle ?? NuntioTextStyle(context: context);
+    this.nuntioFooter = nuntioFooter ?? NuntioFooter();
   }
 
   // style and text config
@@ -34,17 +35,17 @@ class UserBlockWithUI extends StatefulWidget {
   late final NuntioText nuntioText;
   late final NuntioColor nuntioColor;
   late final NuntioTextStyle nuntioTextStyle;
+  late final NuntioFooter nuntioFooter;
 
   // general
-  final Widget child;
   final Widget? logo;
 
   // style
   final BoxDecoration? background;
 
   // functions
-  final Function? onRegister;
-  final Function? onLogin;
+  final Function onRegister;
+  final Function onLogin;
 
   // on authenticated go to child;
   @override
@@ -98,34 +99,36 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
               );
             case ConnectionState.done:
               if (snapshot.data == AuthState.authenticated) {
-                return widget.child;
-              } else if (snapshot.data == null ||
+                widget.onLogin();
+                return CupertinoActivityIndicator();
+              }
+                if (snapshot.data == null ||
                   snapshot.data == AuthState.notAuthenticated) {
                 return LoginPage(
+                  nuntioFooter: widget.nuntioFooter,
                   logo: widget.logo ??
                       Image(
                         image: NetworkImage(_config.logo),
-                        width: 150,
+                        width: widget.nuntioStyle.logoWidth,
                       ),
                   nuntioText: widget.nuntioText,
                   nuntioColor: widget.nuntioColor,
                   nuntioStyle: widget.nuntioStyle,
                   nuntioTextStyle: widget.nuntioTextStyle,
-                  onLogin: widget.onLogin ?? () => {},
-                  onRegister: widget.onRegister ?? () => {},
+                  onLogin: widget.onLogin,
+                  onRegister: widget.onRegister,
                   background: widget.background ??
                       BoxDecoration(color: CupertinoColors.white),
                   config: _config,
                 );
               } else {
-                print(snapshot.data);
                 return NoConnection(
                   background: widget.background ??
                       BoxDecoration(color: CupertinoColors.white),
                   logo: widget.logo ??
                       Image(
                         image: NetworkImage(_config.logo),
-                        width: 150,
+                        width: widget.nuntioStyle.logoWidth,
                       ),
                   nuntioText: widget.nuntioText,
                   nuntioTextStyle: widget.nuntioTextStyle,

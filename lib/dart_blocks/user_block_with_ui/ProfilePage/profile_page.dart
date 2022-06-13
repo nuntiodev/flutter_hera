@@ -72,11 +72,14 @@ class _UserProfileState extends State<UserProfile> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 14, right: 14),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     const SizedBox(
                       height: 20,
                     ),
                     ProfileCard(
+                      width: 500,
                       companyLogo: widget.companyLogo,
                       profileCardDecoration: widget.profileCardDecoration,
                       image: snapshot.data?.image,

@@ -10,7 +10,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NuntioClient.initialize(
     apiKey:
-        "",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0SWQiOiJhOTM4ZDYyMC1mYjAxLTRhM2EtOWNlNy02NjQyNDY1MDk4NTAiLCJwYXNzd29yZCI6Ii40TXk2VzVhLVUqLXFWZH1jNzdBOkd-L05BTnlwVTh9NlRSazRSQ0lcdTAwM2VoQStgXHUwMDI2XHUwMDNjRyEtTDBzQnM2UT9CeF5cIjdwIiwidHlwZSI6MSwianRpIjoiYTU5MmE0YzMtYTAxZi00NTQ2LWJjZGUtZjBiMTJiMjUwNzYwIiwiaXNzIjoiTnVudGlvIENsb3VkIn0.6NucPMRGEhzHOZ43aVpC7PsvOKldMLbO9VXcP3p6oAo",
     debug: true,
   );
   runApp(MyApp());
@@ -61,6 +61,27 @@ class _MyAppState extends State<MyApp> {
             alreadyHaveAccountDescription: "Har du allerede en konto?"),
         background: const BoxDecoration(
           color: CupertinoColors.white,
+        ),
+        nuntioFooter: NuntioFooter(
+          footer: Container(
+            height: 100,
+            width: double.infinity,
+            color: CupertinoColors.darkBackgroundGray,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+
+                Text(
+                  "Ⓒ Sygeplejerskernes Vikarbureau ApS",
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: CupertinoColors.white,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          height: 100,
         ),
       ),
     );

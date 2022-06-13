@@ -397,6 +397,7 @@ class UserBlock {
             (seconds.toString()).toString() +
             "s");
       }
+      req.encryptionKey = _encryptionKey ?? "";
       await _grpcUserClient.recordActiveMeasurement(req);
       return;
     }
@@ -405,6 +406,7 @@ class UserBlock {
   Future<dart_blocks.Config> initializeApplication() async {
     dart_blocks.UserRequest req = dart_blocks.UserRequest();
     req.cloudToken = await _authorize.getAccessToken();
+    req.encryptionKey = _encryptionKey ?? "";
     return (await _grpcUserClient.initializeApplication(req)).config;
   }
 
