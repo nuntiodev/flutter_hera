@@ -32,6 +32,7 @@ class NuntioText {
   late String passwordContainsNumberHint;
   late String passwordsMustMatchHint;
   late String alreadyHaveAccountDescription;
+  late String registerDisabledTipNoteMessage;
 
   // login
   late String loginTitle;
@@ -69,6 +70,7 @@ class NuntioText {
     String? forgotPasswordDetails,
     String? verificationCodeTitle,
     String? alreadyHaveAccountDescription,
+    String? registerDisabledTipNoteMessage,
   }) {
     this.passwordHint = passwordHint ?? "Enter your password";
     this.identifierHint = identifierHint ?? "Enter your email";
@@ -92,7 +94,7 @@ class NuntioText {
     this.registerTitle = registerTitle ?? "Register";
     this.registerDetails = registerDetails ??
         "Fill in the details below to register for an account";
-    this.registerButton = registerButton ?? "Register account";
+    this.registerButton = registerButton ?? "Register";
     this.repeatPasswordHint = repeatPasswordHint ?? "Repeat your password";
     this.passwordDoNotMatchTitle =
         passwordDoNotMatchTitle ?? "Passwords do not match";
@@ -115,6 +117,8 @@ class NuntioText {
         verificationCodeTitle ?? "Enter provided verification code";
     this.alreadyHaveAccountDescription =
         alreadyHaveAccountDescription ?? "Already have an account?";
+    this.registerDisabledTipNoteMessage = registerDisabledTipNoteMessage ??
+        "Enter a valid password to create account";
   }
 }
 

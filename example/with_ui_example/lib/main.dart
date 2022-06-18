@@ -10,7 +10,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NuntioClient.initialize(
     apiKey:
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0SWQiOiJhOTM4ZDYyMC1mYjAxLTRhM2EtOWNlNy02NjQyNDY1MDk4NTAiLCJwYXNzd29yZCI6Ii40TXk2VzVhLVUqLXFWZH1jNzdBOkd-L05BTnlwVTh9NlRSazRSQ0lcdTAwM2VoQStgXHUwMDI2XHUwMDNjRyEtTDBzQnM2UT9CeF5cIjdwIiwidHlwZSI6MSwianRpIjoiYTU5MmE0YzMtYTAxZi00NTQ2LWJjZGUtZjBiMTJiMjUwNzYwIiwiaXNzIjoiTnVudGlvIENsb3VkIn0.6NucPMRGEhzHOZ43aVpC7PsvOKldMLbO9VXcP3p6oAo",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0SWQiOiJudW50aW8tY2xvdWQtaWQiLCJwYXNzd29yZCI6Ilx1MDAyNjd5TFhmNlVyNjhZMHcjTnleflF4bzlNW2FrYW1yZlJiMz0rUGVWTyh9QH0tYHRJKz1adWc1bi1AXmVbM0JcdTAwM2NZIiwidHlwZSI6MSwianRpIjoiODY3YmU4MGQtOGI2YS00ZWJkLTkxOGEtZmE0NDY4ZWNmOTM1IiwiaXNzIjoiTnVudGlvIENsb3VkIn0.kDEsyoM3yvtSih-taStB9zuMkxYjIxNRCq_zbh7zV9s",
+    encryptionKey:
+    "42704c6e6667447363325744384632714e66484b356138346a6a4a6b777a446b",
     debug: true,
   );
   runApp(MyApp());
@@ -30,10 +32,9 @@ class _MyAppState extends State<MyApp> {
         context: context,
         onLogin: () {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => MyApp()),
+            MaterialPageRoute(builder: (context) => Home()),
           );
         },
-        child: Home(),
         nuntioColor: NuntioColor(
           primaryColor: const Color(0xffF63737),
         ),
@@ -82,7 +83,7 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
           height: 100,
-        ),
+        ), onRegister: () => {},
       ),
     );
   }

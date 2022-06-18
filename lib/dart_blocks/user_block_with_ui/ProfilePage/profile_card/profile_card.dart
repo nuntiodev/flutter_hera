@@ -7,7 +7,7 @@ import '../profile_avatar/profile_avatar.dart';
 class ProfileCard extends StatelessWidget {
   ProfileCard({
     Key? key,
-     this.width,
+    this.width,
     this.companyLogo,
     this.profileCardDecoration,
     this.image,
@@ -70,7 +70,7 @@ class ProfileCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: CupertinoColors.white,
                           fontWeight: FontWeight.w500,
-                          fontSize: 18,
+                          fontSize: 16,
                         ),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
@@ -82,27 +82,32 @@ class ProfileCard extends StatelessWidget {
                   ),
                 if (email != null && email?.trim() != "")
                   Text(
-                  email ?? "",
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: CupertinoColors.white,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 18,
-                      ),
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                ),
+                    email ?? "",
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: CupertinoColors.white,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                  ),
                 if (email != null && email?.trim() != "")
                   SizedBox(
                     height: 5,
                   ),
                 if (dateTime != null)
                   Text(
-                    dateTime?.toLocal().toIso8601String() ?? "",
+                    (dateTime?.toLocal().year.toString() ?? "") +
+                        "-" +
+                        (dateTime?.toLocal().day.toString() ?? "") +
+                        "-" +
+                        (dateTime?.toLocal().month.toString() ?? "") +
+                        "-",
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: CupertinoColors.white,
                           fontWeight: FontWeight.w500,
-                          fontSize: 18,
+                          fontSize: 12,
                         ),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,

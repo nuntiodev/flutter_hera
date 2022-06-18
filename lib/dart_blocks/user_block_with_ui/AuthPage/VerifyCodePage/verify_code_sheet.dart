@@ -6,8 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pinput/pinput.dart';
 
-class VerifyCodeSheet extends StatefulWidget {
-  VerifyCodeSheet({
+class VerifyCodePage extends StatefulWidget {
+  VerifyCodePage({
     Key? key,
     required this.verifyCodeTitle,
     required this.buttonHeight,
@@ -23,17 +23,17 @@ class VerifyCodeSheet extends StatefulWidget {
   final double buttonHeight;
 
   @override
-  State<VerifyCodeSheet> createState() => _VerifyCodeSheetState();
+  State<VerifyCodePage> createState() => _VerifyCodePageState();
 }
 
-class _VerifyCodeSheetState extends State<VerifyCodeSheet> {
+class _VerifyCodePageState extends State<VerifyCodePage> {
   final verifyCodeController = TextEditingController();
   DateTime _now = DateTime.now();
   bool _isLoading = false;
   bool _hasError = false;
   late Timer _timer;
 
-  _VerifyCodeSheetState() {
+  _VerifyCodePageState() {
     _timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
       setState(() {
         _now = DateTime.now();

@@ -18,7 +18,6 @@ class UserAnalytics extends StatefulWidget {
 
 class _UserAnalyticsState extends State<UserAnalytics>
     with WidgetsBindingObserver {
-
   // init
   late Future<void> initializeAnalyticsFuture;
   late Timer? _timer;
@@ -97,6 +96,14 @@ class _UserAnalyticsState extends State<UserAnalytics>
           if (_prevTotalSeconds > 0 &&
               _prevActiveId != "" &&
               _prevActiveUserId != "") {
+            print("s:" +
+                _prevTotalSeconds.toString() +
+                " " +
+                "active ID:" +
+                _prevActiveId +
+                " " +
+                "user ID:" +
+                _prevActiveUserId);
             await NuntioClient.userBlock.recordActiveMeasurement(
                 _prevTotalSeconds, _prevActiveId, _prevActiveUserId);
           }
@@ -114,22 +121,19 @@ class _UserAnalyticsState extends State<UserAnalytics>
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      backgroundColor: Colors.white,
-      child: FutureBuilder<void>(
-          future: initializeAnalyticsFuture,
-          builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return const Center(
-                  child: CupertinoActivityIndicator(),
-                );
-              case ConnectionState.done:
-                return widget.child;
-              default:
-                return Text("Error");
-            }
-          }),
-    );
+    return FutureBuilder<void>(
+        future: initializeAnalyticsFuture,
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return const Center(
+                child: CupertinoActivityIndicator(),
+              );
+            case ConnectionState.done:
+              return widget.child;
+            default:
+              return Text("Error");
+          }
+        });
   }
 }

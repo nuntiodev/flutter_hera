@@ -15,6 +15,7 @@ class UserBlockWithUI extends StatefulWidget {
     required BuildContext context,
     required this.onRegister,
     required this.onLogin,
+    this.identifierInputType,
     NuntioText? nuntioText,
     NuntioColor? nuntioColor,
     NuntioTextStyle? nuntioTextStyle,
@@ -23,6 +24,13 @@ class UserBlockWithUI extends StatefulWidget {
     this.logo,
     this.background,
   }) {
+    if (identifierInputType != null &&
+        identifierInputType != TextInputType.emailAddress &&
+        identifierInputType != TextInputType.phone &&
+        identifierInputType != TextInputType.text) {
+      throw Exception(
+          "invalid identifierInputType, value must equal TextInputType.emailAddress (email), TextInputType.phone (phone) or TextInputType.text (username)");
+    }
     this.nuntioStyle = nuntioStyle ?? NuntioStyle();
     this.nuntioText = nuntioText ?? NuntioText();
     this.nuntioColor = nuntioColor ?? NuntioColor();
@@ -39,6 +47,7 @@ class UserBlockWithUI extends StatefulWidget {
 
   // general
   final Widget? logo;
+  final TextInputType? identifierInputType;
 
   // style
   final BoxDecoration? background;
@@ -90,56 +99,58 @@ class _UserBlockWithUIState extends State<UserBlockWithUI> {
       resizeToAvoidBottomInset: false,
       backgroundColor: CupertinoColors.systemBackground,
       child: FutureBuilder<AuthState>(
-        future: initializeNuntioUIFuture,
-        builder: (BuildContext context, AsyncSnapshot<AuthState> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return const Center(
-                child: CupertinoActivityIndicator(),
-              );
-            case ConnectionState.done:
-              if (snapshot.data == AuthState.authenticated) {
-                widget.onLogin();
-                return CupertinoActivityIndicator();
-              }
+          future: initializeNuntioUIFuture,
+          builder: (BuildContext context, AsyncSnapshot<AuthState> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return const Center(
+                  child: CupertinoActivityIndicator(),
+                );
+              case ConnectionState.done:
+                if (snapshot.data == AuthState.authenticated) {
+                  widget.onLogin();
+                  return CupertinoActivityIndicator();
+                }
                 if (snapshot.data == null ||
-                  snapshot.data == AuthState.notAuthenticated) {
-                return LoginPage(
-                  nuntioFooter: widget.nuntioFooter,
-                  logo: widget.logo ??
-                      Image(
-                        image: NetworkImage(_config.logo),
-                        width: widget.nuntioStyle.logoWidth,
-                      ),
-                  nuntioText: widget.nuntioText,
-                  nuntioColor: widget.nuntioColor,
-                  nuntioStyle: widget.nuntioStyle,
-                  nuntioTextStyle: widget.nuntioTextStyle,
-                  onLogin: widget.onLogin,
-                  onRegister: widget.onRegister,
-                  background: widget.background ??
-                      BoxDecoration(color: CupertinoColors.white),
-                  config: _config,
-                );
-              } else {
-                return NoConnection(
-                  background: widget.background ??
-                      BoxDecoration(color: CupertinoColors.white),
-                  logo: widget.logo ??
-                      Image(
-                        image: NetworkImage(_config.logo),
-                        width: widget.nuntioStyle.logoWidth,
-                      ),
-                  nuntioText: widget.nuntioText,
-                  nuntioTextStyle: widget.nuntioTextStyle,
-                  nuntioColor: widget.nuntioColor,
-                );
-              }
-            default:
-              return Text("Error");
-          }
-        },
-      ),
+                    snapshot.data == AuthState.notAuthenticated) {
+                  return LoginPage(
+                    identifierInputType: widget.identifierInputType ??
+                        TextInputType.emailAddress,
+                    nuntioFooter: widget.nuntioFooter,
+                    logo: widget.logo ??
+                        Image(
+                          image: NetworkImage(_config.logo),
+                          width: widget.nuntioStyle.logoWidth,
+                        ),
+                    nuntioText: widget.nuntioText,
+                    nuntioColor: widget.nuntioColor,
+                    nuntioStyle: widget.nuntioStyle,
+                    nuntioTextStyle: widget.nuntioTextStyle,
+                    onLogin: widget.onLogin,
+                    onRegister: widget.onRegister,
+                    background: widget.background ??
+                        BoxDecoration(color: CupertinoColors.white),
+                    config: _config,
+                  );
+                } else {
+                  return NoConnection(
+                    background: widget.background ??
+                        BoxDecoration(color: CupertinoColors.white),
+                    logo: widget.logo ??
+                        Image(
+                          image: NetworkImage(_config.logo),
+                          width: widget.nuntioStyle.logoWidth,
+                        ),
+                    nuntioText: widget.nuntioText,
+                    nuntioTextStyle: widget.nuntioTextStyle,
+                    nuntioColor: widget.nuntioColor,
+                  );
+                }
+              default:
+                return Text("Error");
+            }
+          },
+        ),
     );
   }
 }

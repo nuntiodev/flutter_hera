@@ -2,17 +2,16 @@ import 'package:dart_blocks/dart_blocks/components/nuntio_button.dart';
 import 'package:dart_blocks/dart_blocks/components/text_field_decoration.dart';
 import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:dart_blocks/dart_blocks/user_block_with_ui/AuthPage/RegisterPage/register_page.dart';
+import 'package:dart_blocks/dart_blocks/user_block_with_ui/AuthPage/VerifyCodePage/verify_code_sheet.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:nuntio_blocks/block_user.pb.dart';
-
 import '../../models.dart';
-import '../VerifyCodeSheet/verify_code_sheet.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({
     Key? key,
+    required this.identifierInputType,
     required this.nuntioFooter,
     required this.nuntioStyle,
     required this.nuntioText,
@@ -35,6 +34,7 @@ class LoginPage extends StatefulWidget {
   // general
   final Widget logo;
   final Config config;
+  final TextInputType identifierInputType;
 
   // style
   final BoxDecoration background;
@@ -79,13 +79,14 @@ class _LoginPageState extends State<LoginPage> {
       child: SingleChildScrollView(
         child: Container(
           decoration: widget.background,
+          constraints: BoxConstraints(minHeight: size.height),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              SizedBox(),
               Center(
                 child: Container(
-                  height: size.height-widget.nuntioFooter.height,
                   constraints: BoxConstraints(maxWidth: 400),
                   margin: const EdgeInsets.only(
                       left: 20, right: 20, bottom: 20, top: 0),
@@ -123,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             controller: emailController,
                             placeholder: widget.nuntioText.identifierHint,
-                            keyboardType: TextInputType.emailAddress,
+                            keyboardType: widget.identifierInputType,
                           ),
                         ),
                       if (!widget.config.disableDefaultLogin)
@@ -152,14 +153,14 @@ class _LoginPageState extends State<LoginPage> {
                       if (!widget.config.disableDefaultLogin)
                         Align(
                           alignment: Alignment.centerRight,
-                          child: CupertinoButton(
+                          child: NuntioButton(
                             padding: EdgeInsets.all(0),
                             child: Text(
                               widget.nuntioText.forgotPasswordDetails,
-                              style: widget.nuntioTextStyle.descriptionStyle,
                               textAlign: TextAlign.center,
                             ),
                             onPressed: () {},
+                            color: CupertinoColors.black,
                           ),
                         ),
                       if (!widget.config.disableDefaultLogin)
@@ -259,7 +260,7 @@ class _LoginPageState extends State<LoginPage> {
                                   showCupertinoModalBottomSheet(
                                     context: context,
                                     useRootNavigator: true,
-                                    builder: (context) => VerifyCodeSheet(
+                                    builder: (context) => VerifyCodePage(
                                       buttonHeight:
                                           widget.nuntioStyle.buttonWidth,
                                       buttonWidth:
@@ -366,6 +367,7 @@ class _LoginPageState extends State<LoginPage> {
                                     onRegister: widget.onRegister,
                                     config: widget.config,
                                     nuntioTextStyle: widget.nuntioTextStyle,
+                                    nuntioFooter: widget.nuntioFooter,
                                   ),
                                 ),
                               );

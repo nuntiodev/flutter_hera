@@ -1,7 +1,23 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+// ranges from 0.0 to 1.0
+
+Color withDarken(Color color, [double amount = .1]) {
+  assert(amount >= 0 && amount <= 1);
+
+  final hsl = HSLColor.fromColor(color);
+  final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+
+  return hslDark.toColor();
+}
 
 class NuntioButton extends StatefulWidget {
   final bool? filled;
+  final bool? disabled;
+  final bool? darken;
+  final EdgeInsets? padding;
+  final String? disabledTipnote;
   final Color color;
   final Widget child;
   final void Function()? onPressed;
@@ -10,6 +26,10 @@ class NuntioButton extends StatefulWidget {
     required this.color,
     required this.child,
     required this.onPressed,
+    this.disabledTipnote,
+    this.darken,
+    this.disabled,
+    this.padding,
     this.filled,
   });
 
@@ -17,7 +37,7 @@ class NuntioButton extends StatefulWidget {
   State<NuntioButton> createState() {
     return _NuntioButtonState(
       color: color,
-      enterColor: color.withOpacity(0.85),
+      enterColor: darken == true ? withDarken(color, 0.2) : color.withOpacity(0.7),
       exitColor: color,
     );
   }
@@ -30,6 +50,18 @@ class _NuntioButtonState extends State<NuntioButton> {
 
   _NuntioButtonState(
       {required this.color, required this.enterColor, required this.exitColor});
+
+  getTipNote({required Widget child}) {
+    if (widget.disabled == true &&
+        widget.disabledTipnote != null &&
+        widget.disabledTipnote != "") {
+      return Tooltip(
+        message: widget.disabledTipnote,
+        child: child,
+      );
+    }
+    return child;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +76,28 @@ class _NuntioButtonState extends State<NuntioButton> {
           color = exitColor;
         });
       },
-      child: CupertinoButton(
-        child: widget.child,
-        onPressed: widget.onPressed,
-        color: widget.filled == true ? color : null,
+      child: getTipNote(
+        child: CupertinoTheme(
+          data: CupertinoThemeData(
+            primaryColor: color,
+            textTheme: CupertinoTextThemeData(
+              primaryColor: color,
+              actionTextStyle: TextStyle(
+                color: color,
+              ),
+              textStyle: TextStyle(
+                color: color,
+              ),
+            ),
+          ),
+          child: CupertinoButton(
+            padding: widget.padding,
+            child: widget.child,
+            disabledColor: exitColor.withOpacity(0.3),
+            onPressed: widget.disabled == true ? null : widget.onPressed,
+            color: widget.filled == true ? color : null,
+          ),
+        ),
       ),
     );
   }

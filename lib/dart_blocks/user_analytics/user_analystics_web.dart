@@ -1,21 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class UserAnalyticsWeb extends StatefulWidget {
+class UserAnalytics extends StatefulWidget {
   final Widget child;
 
-  UserAnalyticsWeb({required this.child});
+  UserAnalytics({required this.child});
 
   @override
-  State<UserAnalyticsWeb> createState() => _UserAnalyticsWebState();
+  State<UserAnalytics> createState() => _UserAnalyticsState();
 }
 
-class _UserAnalyticsWebState extends State<UserAnalyticsWeb> {
+class _UserAnalyticsState extends State<UserAnalytics> {
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      backgroundColor: Colors.white,
-      child: widget.child,
-    );
+    return widget.child;
   }
 }
