@@ -1,7 +1,4 @@
-import 'package:dart_blocks/dart_blocks/models/auth.dart';
-import 'package:dart_blocks/dart_blocks/user_block_with_ui/AuthPage/LoginPage/login_page.dart';
-import 'package:dart_blocks/dart_blocks/user_block_with_ui/AuthPage/RegisterPage/register_page.dart';
-import 'package:dart_blocks/dart_blocks/user_block_with_ui/models.dart';
+import 'package:dart_blocks/dart_blocks/hera_app/models.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

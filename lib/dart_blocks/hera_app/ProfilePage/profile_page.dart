@@ -1,12 +1,13 @@
+import 'package:dart_blocks/dart_blocks/hera_app/ProfilePage/profile_card/profile_card.dart';
+import 'package:dart_blocks/dart_blocks/hera_app/ProfilePage/update_email_dialog/update_email_dialog.dart';
+import 'package:dart_blocks/dart_blocks/hera_app/ProfilePage/update_password_dialog/update_password_dialog.dart';
 import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
-import 'package:dart_blocks/dart_blocks/user_block_with_ui/ProfilePage/profile_card/profile_card.dart';
-import 'package:dart_blocks/dart_blocks/user_block_with_ui/ProfilePage/update_email_dialog/update_email_dialog.dart';
-import 'package:dart_blocks/dart_blocks/user_block_with_ui/ProfilePage/update_password_dialog/update_password_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nuntio_blocks/block_user.pb.dart';
 import 'package:nuntio_blocks/google/protobuf/timestamp.pb.dart';
 
+import '../../components/nuntio_indicator.dart';
 import 'button_card/button_card.dart';
 
 class UserProfile extends StatefulWidget {
@@ -64,8 +65,8 @@ class _UserProfileState extends State<UserProfile> {
       builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
-            return const Center(
-              child: CupertinoActivityIndicator(),
+            return Center(
+              child: NuntioIndicator(size: 50),
             );
           case ConnectionState.done:
             return SingleChildScrollView(

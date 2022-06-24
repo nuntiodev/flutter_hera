@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+import '../../../components/nuntio_indicator.dart';
 import '../../../helpers/validate_email.dart';
 import '../../../nuntio_client.dart';
 
@@ -53,7 +54,7 @@ class _UpdatePasswordDialogState extends State<UpdatePasswordDialog> {
       actions: <Widget>[
         CupertinoDialogAction(
           child: isLoading
-              ? CupertinoActivityIndicator()
+              ? NuntioIndicator()
               : Text(
                   "Cancel",
                   style: TextStyle(color: CupertinoColors.systemRed),
@@ -63,7 +64,7 @@ class _UpdatePasswordDialogState extends State<UpdatePasswordDialog> {
           },
         ),
         CupertinoDialogAction(
-            child: isLoading ? CupertinoActivityIndicator() : Text("Update"),
+            child: isLoading ? NuntioIndicator() : Text("Update"),
             onPressed: () {
               if (isLoading == false) {
                 setState(() {

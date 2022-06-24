@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' as WhichPlatform;
-import 'package:biometric_storage/biometric_storage.dart';
 import 'package:dart_blocks/nuntio_authorize/nuntio_authorize.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/foundation.dart';
@@ -13,14 +12,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class UserBlock {
   UserBlock({
     required dart_blocks.UserServiceClient grpcUserClient,
     required Authorize authorize,
     required String? jwtPublicKey,
     required this.sharedPreferences,
-    this.biometricStorage,
     this.debug,
     String? encryptionKey,
     Function? onLogin,
@@ -40,7 +37,6 @@ class UserBlock {
   // Create storage which is used to store tokens
   late final FlutterSecureStorage _secureStorage;
   late final SharedPreferences sharedPreferences;
-  final BiometricStorage? biometricStorage;
 
   // _grpcUserClient is an object to communicate with the dart_blocks
   late final dart_blocks.UserServiceClient _grpcUserClient;
@@ -68,8 +64,6 @@ class UserBlock {
 
   // _placemark is used to send data to the backend about user location
   Placemark? _placemark;
-
-  final String _savedBiometricUsersKey = "nuntio-shared-biometric-users";
 
   static final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
 
@@ -236,7 +230,7 @@ class UserBlock {
     req.user = user;
     // set metadata for token
     dart_blocks.Token _token = dart_blocks.Token();
-    _token.deviceInfo = await _getDeviceInfo() ?? "";
+    _token.deviceInfo = await _getDeviceInfo();
     var _placemark = await _determinePlacemark();
     if (_placemark != null) {
       dart_blocks.Location _location = dart_blocks.Location();
@@ -348,7 +342,7 @@ class UserBlock {
         req.cloudToken = await _authorize.getAccessToken();
         // set metadata for token
         dart_blocks.Token _token = dart_blocks.Token();
-        _token.deviceInfo = await _getDeviceInfo() ?? "";
+        _token.deviceInfo = await _getDeviceInfo();
         Placemark? _placemark = this._placemark ?? await _determinePlacemark();
         if (_placemark != null) {
           dart_blocks.Location _location = dart_blocks.Location();
@@ -372,7 +366,6 @@ class UserBlock {
     }
     return false;
   }
-
 
   Future<void> recordActiveMeasurement(
       int seconds, String activeId, String userId) async {
@@ -399,6 +392,9 @@ class UserBlock {
       }
       req.encryptionKey = _encryptionKey ?? "";
       await _grpcUserClient.recordActiveMeasurement(req);
+      if(debug == true){
+        print("done sending data...");
+      }
       return;
     }
   }
@@ -411,7 +407,7 @@ class UserBlock {
   }
 
   /// Determine the name of the device.
-  Future<String?> _getDeviceInfo() async {
+  Future<String> _getDeviceInfo() async {
     try {
       if (kIsWeb) {
         return "Web";
@@ -432,14 +428,14 @@ class UserBlock {
       if (debug == true)
         print("could not get device info with err: " + e.toString());
     }
-    return null;
+    return "";
   }
 
   /// Determine the current position of the device.
   /// When the location services are not enabled or permissions
   /// are denied the `Future` will return an error.
   Future<Placemark?> _determinePlacemark() async {
-    if(kIsWeb){
+    if (kIsWeb) {
       return null;
     }
     try {
@@ -456,7 +452,9 @@ class UserBlock {
       }
 
       permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
+      if (permission == LocationPermission.unableToDetermine) {
+        return null;
+      } else if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
           // Permissions are denied, next time you could try
@@ -467,13 +465,10 @@ class UserBlock {
           return Future.error('Location permissions are denied');
         }
       }
-
       if (permission == LocationPermission.deniedForever) {
         // Permissions are denied forever, handle appropriately.
-        return Future.error(
-            'Location permissions are permanently denied, we cannot request permissions.');
+        return null;
       }
-
       // When we reach here, permissions are granted and we can
       // continue accessing the position of the device.
       Position position = await Geolocator.getCurrentPosition();

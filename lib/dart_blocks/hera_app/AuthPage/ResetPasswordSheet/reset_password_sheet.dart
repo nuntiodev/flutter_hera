@@ -3,11 +3,12 @@ import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pinput/pinput.dart';
 
-class VerifyCodePage extends StatefulWidget {
-  VerifyCodePage({
+import '../../../components/nuntio_indicator.dart';
+
+class ResetPasswordSheet extends StatefulWidget {
+  ResetPasswordSheet({
     Key? key,
     required this.verifyCodeTitle,
     required this.buttonHeight,
@@ -23,17 +24,17 @@ class VerifyCodePage extends StatefulWidget {
   final double buttonHeight;
 
   @override
-  State<VerifyCodePage> createState() => _VerifyCodePageState();
+  State<ResetPasswordSheet> createState() => _ResetPasswordSheetState();
 }
 
-class _VerifyCodePageState extends State<VerifyCodePage> {
+class _ResetPasswordSheetState extends State<ResetPasswordSheet> {
   final verifyCodeController = TextEditingController();
   DateTime _now = DateTime.now();
   bool _isLoading = false;
   bool _hasError = false;
   late Timer _timer;
 
-  _VerifyCodePageState() {
+  _ResetPasswordSheetState() {
     _timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
       setState(() {
         _now = DateTime.now();
@@ -62,9 +63,8 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoScaffold(
-      transitionBackgroundColor: CupertinoColors.white,
-      body: Padding(
+    return CupertinoPageScaffold(
+      child: Padding(
         padding: EdgeInsets.all(12),
         child: Column(
           children: [
@@ -108,7 +108,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
             if (_hasError)
               Text(
                 "Something went wrong. Please try again and make sure your code is valid.",
-                style: Theme.of(context).textTheme.bodyText1
+                style: TextStyle(color: CupertinoColors.systemRed),
               ),
             if (_hasError)
               SizedBox(
@@ -119,10 +119,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
               height: widget.buttonHeight,
               child: CupertinoButton(
                 child: _isLoading
-                    ? CupertinoActivityIndicator()
+                    ? NuntioIndicator(color: CupertinoColors.white)
                     : Text(
                         "Verify your email",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: CupertinoColors.white),
                       ),
                 color: CupertinoColors.black,
                 onPressed: () {

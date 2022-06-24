@@ -15,6 +15,9 @@ class NuntioText {
   late String errorDescription;
   late String noWifiTitle;
   late String noWifiDescription;
+  late String identifierName;
+  late String passwordName;
+  late String repeatPasswordName;
 
   // welcome
   late String welcomeTitle;
@@ -40,6 +43,13 @@ class NuntioText {
   late String loginButton;
   late String forgotPasswordDetails;
   late String verificationCodeTitle;
+
+  // verify page
+  late String verifyIdentifierTitle;
+  late String verifyIdentifierDescription;
+  late String verifyButton;
+  late String invalidCodeTitle;
+  late String invalidCodeDescription;
 
   NuntioText({
     String? passwordHint,
@@ -71,9 +81,17 @@ class NuntioText {
     String? verificationCodeTitle,
     String? alreadyHaveAccountDescription,
     String? registerDisabledTipNoteMessage,
+    String? verifyIdentifierTitle,
+    String? verifyIdentifierDescription,
+    String? verifyButton,
+    String? invalidCodeTitle,
+    String? invalidCodeDescription,
+    String? identifierName,
+    String? passwordName,
+    String? repeatPasswordName,
   }) {
-    this.passwordHint = passwordHint ?? "Enter your password";
-    this.identifierHint = identifierHint ?? "Enter your email";
+    this.passwordHint = passwordHint ?? "JohnDoe1234!";
+    this.identifierHint = identifierHint ?? "your@email.io";
     this.missingIdentifierTitle =
         missingIdentifierTitle ?? "Missing required email";
     this.missingIdentifierDescription = missingIdentifierDescription ??
@@ -119,6 +137,16 @@ class NuntioText {
         alreadyHaveAccountDescription ?? "Already have an account?";
     this.registerDisabledTipNoteMessage = registerDisabledTipNoteMessage ??
         "Enter a valid password to create account";
+    this.verifyIdentifierTitle = verifyIdentifierTitle ?? "Verify your account";
+    this.verifyIdentifierDescription = verifyIdentifierDescription ??
+        "We have sent you a verification code. Please enter the code below.";
+    this.verifyButton = verifyButton ?? "Verify account";
+    this.invalidCodeTitle = invalidCodeTitle ?? "Invalid code";
+    this.invalidCodeDescription =
+        invalidCodeDescription ?? "The code that you have provided is invalid";
+    this.identifierName = identifierName ?? "Email";
+    this.passwordName = passwordName ?? "Password";
+    this.repeatPasswordName = repeatPasswordName ?? "Repeat password";
   }
 }
 
@@ -128,6 +156,7 @@ class NuntioTextStyle {
   late TextStyle bodyTextStyle;
   late TextStyle loginButtonTextStyle;
   late TextStyle registerButtonTextStyle;
+  late TextStyle labelStyle;
 
   NuntioTextStyle({
     TextStyle? titleStyle,
@@ -135,15 +164,20 @@ class NuntioTextStyle {
     TextStyle? bodyTextStyle,
     TextStyle? loginButtonTextStyle,
     TextStyle? registerButtonTextStyle,
+    TextStyle? labelStyle,
     required BuildContext context,
   }) {
-    this.titleStyle =
-        titleStyle ?? Theme.of(context).textTheme.titleLarge ?? TextStyle();
-    this.descriptionStyle = descriptionStyle ??
+    this.titleStyle = titleStyle ??
         Theme.of(context)
             .textTheme
-            .titleMedium
-            ?.copyWith(color: CupertinoColors.black) ??
+            .titleLarge
+            ?.copyWith(fontWeight: FontWeight.bold, fontSize: 32) ??
+        TextStyle();
+    this.descriptionStyle = descriptionStyle ??
+        Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: CupertinoColors.systemGrey,
+              fontSize: 18,
+            ) ??
         TextStyle();
     this.bodyTextStyle = bodyTextStyle ??
         Theme.of(context)
@@ -152,13 +186,20 @@ class NuntioTextStyle {
             ?.copyWith(color: CupertinoColors.black) ??
         TextStyle();
     this.loginButtonTextStyle = loginButtonTextStyle ??
+        Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: CupertinoColors.white, fontWeight: FontWeight.w500) ??
+        TextStyle();
+    this.registerButtonTextStyle = registerButtonTextStyle ??
         Theme.of(context)
             .textTheme
             .titleMedium
-            ?.copyWith(color: CupertinoColors.white) ??
+            ?.copyWith(fontWeight: FontWeight.w500) ??
         TextStyle();
-    this.registerButtonTextStyle = registerButtonTextStyle ??
-        Theme.of(context).textTheme.titleMedium ??
+    this.labelStyle = labelStyle ??
+        Theme.of(context)
+            .textTheme
+            .labelLarge
+            ?.copyWith(fontWeight: FontWeight.bold) ??
         TextStyle();
   }
 }
@@ -177,7 +218,7 @@ class NuntioColor {
     Color? errorColor,
     Color? disabledColor,
   }) {
-    this.primaryColor = primaryColor ?? CupertinoColors.systemBlue;
+    this.primaryColor = primaryColor ?? CupertinoColors.black;
     this.secondaryColor = secondaryColor ?? CupertinoColors.systemGrey6;
     this.successColor = successColor ?? CupertinoColors.systemBlue;
     this.errorColor = errorColor ?? CupertinoColors.systemRed;
@@ -186,28 +227,24 @@ class NuntioColor {
 }
 
 class NuntioStyle {
-  late Border border;
   late Color borderColor;
+  late Color textFieldColor;
   late double buttonWidth;
   late double buttonHeight;
-  late double logoWidth;
-
+  late double logoHeight;
   NuntioStyle({
     Border? border,
     Color? borderColor,
+    Color? textFieldColor,
     double? buttonWidth,
     double? buttonHeight,
-    double? logoWidth,
+    double? logoHeight,
   }) {
-    this.border = border ??
-        Border.all(
-          color: Color(0xffe2e2e2),
-          width: 0.5,
-        );
-    this.borderColor = borderColor ?? CupertinoColors.white;
-    this.buttonWidth = buttonWidth ?? 250;
-    this.buttonHeight = buttonHeight ?? 55;
-    this.logoWidth = logoWidth ?? 150;
+    this.borderColor = borderColor ?? CupertinoColors.systemGrey5;
+    this.textFieldColor = textFieldColor ?? CupertinoColors.white;
+    this.buttonWidth = buttonWidth ?? double.infinity;
+    this.buttonHeight = buttonHeight ?? 50;
+    this.logoHeight = logoHeight ?? 120;
   }
 }
 

@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:nuntio_blocks/block_user.pb.dart';
+import '../../components/nuntio_indicator.dart';
 import '../../nuntio_client.dart';
 
 Future<User?> _getAuthState() async {
@@ -43,15 +44,15 @@ class _AuthenticatedState extends State<Authenticated> {
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
-            return const Center(
-              child: CupertinoActivityIndicator(),
+            return Center(
+              child: NuntioIndicator(),
             );
           case ConnectionState.done:
             if (snapshot.data != null) {
               return widget.builder(snapshot.data);
             }
             widget.ifNotAuthenticated();
-            return CupertinoActivityIndicator();
+            return NuntioIndicator();
           default:
             return Text("Error");
         }

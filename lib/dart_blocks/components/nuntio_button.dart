@@ -16,6 +16,7 @@ class NuntioButton extends StatefulWidget {
   final bool? filled;
   final bool? disabled;
   final bool? darken;
+  final bool? loading;
   final EdgeInsets? padding;
   final String? disabledTipnote;
   final Color color;
@@ -28,6 +29,7 @@ class NuntioButton extends StatefulWidget {
     required this.onPressed,
     this.disabledTipnote,
     this.darken,
+    this.loading,
     this.disabled,
     this.padding,
     this.filled,
@@ -37,7 +39,8 @@ class NuntioButton extends StatefulWidget {
   State<NuntioButton> createState() {
     return _NuntioButtonState(
       color: color,
-      enterColor: darken == true ? withDarken(color, 0.2) : color.withOpacity(0.7),
+      enterColor:
+          darken == true ? withDarken(color, 0.2) : color.withOpacity(0.7),
       exitColor: color,
     );
   }
@@ -94,7 +97,11 @@ class _NuntioButtonState extends State<NuntioButton> {
             padding: widget.padding,
             child: widget.child,
             disabledColor: exitColor.withOpacity(0.3),
-            onPressed: widget.disabled == true ? null : widget.onPressed,
+            onPressed: widget.disabled == true
+                ? null
+                : widget.loading == true
+                    ? null
+                    : widget.onPressed,
             color: widget.filled == true ? color : null,
           ),
         ),

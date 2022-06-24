@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../components/nuntio_indicator.dart';
+
 class ProfileAvatar extends StatelessWidget {
   ProfileAvatar({
     Key? key,
@@ -48,7 +50,7 @@ class ProfileAvatar extends StatelessWidget {
               ),
             ),
           ),
-          placeholder: (context, url) => CupertinoActivityIndicator(),
+          placeholder: (context, url) => NuntioIndicator(),
           errorWidget: (context, url, error) {
             print(error.toString());
             return Container(

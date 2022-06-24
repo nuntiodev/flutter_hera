@@ -7,10 +7,14 @@ import 'package:nuntio_blocks/block_user.pb.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
+import '../components/nuntio_indicator.dart';
+
 class UserAnalytics extends StatefulWidget {
   final Widget child;
 
-  UserAnalytics({required this.child});
+  UserAnalytics({required this.child}) {
+    print("using Nuntio Hera device analytics");
+  }
 
   @override
   State<UserAnalytics> createState() => _UserAnalyticsState();
@@ -20,7 +24,7 @@ class _UserAnalyticsState extends State<UserAnalytics>
     with WidgetsBindingObserver {
   // init
   late Future<void> initializeAnalyticsFuture;
-  late Timer? _timer;
+  Timer? _timer;
   final String _activeKeySeconds = "nuntio-blocks-active-seconds";
   final String _activeKeyId = "nuntio-blocks-active-id";
   final String _activeKeyUserId = "nuntio-blocks-active-user-id";
@@ -67,12 +71,9 @@ class _UserAnalyticsState extends State<UserAnalytics>
     });
   }
 
-  _UserAnalyticsState() {
-    initializeAnalyticsFuture = initializeAnalytics();
-  }
-
   @override
   void initState() {
+    initializeAnalyticsFuture = initializeAnalytics();
     WidgetsBinding.instance.addObserver(this);
     _measureUserTime();
     super.initState();
@@ -126,8 +127,8 @@ class _UserAnalyticsState extends State<UserAnalytics>
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
-              return const Center(
-                child: CupertinoActivityIndicator(),
+              return Center(
+                child: NuntioIndicator(),
               );
             case ConnectionState.done:
               return widget.child;

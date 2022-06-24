@@ -1,6 +1,6 @@
 name: dart_blocks
 description: An SDK written in Dart to communicate with Nuntio Blocks and Cloud
-version: 0.4.33
+version: 0.4.86
 homepage: https://github.com/nuntiodev
 
 environment:
@@ -12,15 +12,16 @@ dependencies:
     sdk: flutter
   nuntio_blocks: ^0.0.21
   nuntio_cloud: ^0.0.2
-  biometric_storage: ^4.1.1
   jwt_decoder: ^2.0.1
   protobuf: ^2.0.1
+  animate_do: ^2.1.0
   grpc: ^3.0.2
+  google_fonts: ^3.0.1
   cached_network_image: ^3.2.0
   fixnum: ^1.0.0
+  font_awesome_flutter: ^10.1.0
   dart_jsonwebtoken: ^2.4.1
   flutter_secure_storage: ^5.0.2
-  modal_bottom_sheet: ^2.0.1
   connectivity_plus: ^2.3.0
   uuid: ^3.0.6
   pinput: ^2.2.8
@@ -28,6 +29,8 @@ dependencies:
   shared_preferences: ^2.0.13
   geolocator: ^8.2.0
   geocoding: ^2.0.4
+  flutter_svg: ^1.1.0
+
 dev_dependencies:
   lints: ^1.0.0
   test: ^1.20.2
