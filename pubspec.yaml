@@ -1,6 +1,6 @@
 name: dart_blocks
 description: An SDK written in Dart to communicate with Nuntio Blocks and Cloud
-version: 0.4.86
+version: 0.4.89
 homepage: https://github.com/nuntiodev
 
 environment:
@@ -16,7 +16,6 @@ dependencies:
   protobuf: ^2.0.1
   animate_do: ^2.1.0
   grpc: ^3.0.2
-  google_fonts: ^3.0.1
   cached_network_image: ^3.2.0
   fixnum: ^1.0.0
   font_awesome_flutter: ^10.1.0

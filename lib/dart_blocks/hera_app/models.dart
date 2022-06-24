@@ -220,7 +220,7 @@ class NuntioColor {
   }) {
     this.primaryColor = primaryColor ?? CupertinoColors.black;
     this.secondaryColor = secondaryColor ?? CupertinoColors.systemGrey6;
-    this.successColor = successColor ?? CupertinoColors.systemBlue;
+    this.successColor = successColor ?? Color(0xff0550e7);
     this.errorColor = errorColor ?? CupertinoColors.systemRed;
     this.disabledColor = disabledColor ?? CupertinoColors.lightBackgroundGray;
   }
@@ -232,6 +232,7 @@ class NuntioStyle {
   late double buttonWidth;
   late double buttonHeight;
   late double logoHeight;
+
   NuntioStyle({
     Border? border,
     Color? borderColor,

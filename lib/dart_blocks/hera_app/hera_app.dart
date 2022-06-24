@@ -9,7 +9,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:nuntio_blocks/block_user.pb.dart';
 import '../components/nuntio_indicator.dart';
 import '../hera_app/models.dart';
@@ -112,11 +111,7 @@ class _HeraAppState extends State<HeraApp> {
             }
             if (snapshot.data == null ||
                 snapshot.data == AuthState.notAuthenticated) {
-              return Theme(
-                data: ThemeData(
-                  textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
-                ),
-                child: CupertinoApp(
+              return CupertinoApp(
                   debugShowCheckedModeBanner: false,
                   home: LoginPage(
                     identifierInputType:
@@ -150,7 +145,6 @@ class _HeraAppState extends State<HeraApp> {
                     background: widget.background ??
                         BoxDecoration(color: CupertinoColors.white),
                     config: _config,
-                  ),
                 ),
               );
             } else {
