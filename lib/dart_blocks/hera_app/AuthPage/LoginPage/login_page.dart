@@ -204,7 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Container(
                   constraints: BoxConstraints(maxWidth: 400),
                   margin: const EdgeInsets.only(
-                      left: 20, right: 20, bottom: 20, top: 0),
+                      left: 25, right: 25, bottom: 20, top: 0),
                   child: FadeInUp(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,

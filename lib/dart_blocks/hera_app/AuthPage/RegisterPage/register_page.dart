@@ -2,6 +2,7 @@ import 'package:dart_blocks/dart_blocks/components/nuntio_button.dart';
 import 'package:dart_blocks/dart_blocks/hera_app/AuthPage/VerifyCodePage/verify_code_page.dart';
 import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nuntio_blocks/block_user.pb.dart';
 import '../../../components/nuntio_indicator.dart';
 import '../../../components/nuntio_text_field.dart';
@@ -343,7 +344,6 @@ class _RegisterPageState extends State<RegisterPage> {
                         textInputType: TextInputType.emailAddress,
                         label: widget.nuntioText.identifierName,
                         textInputAction: TextInputAction.next,
-                        obscureText: true,
                       ),
                       const SizedBox(
                         height: 15,
@@ -489,25 +489,40 @@ class _RegisterPageState extends State<RegisterPage> {
                         width: widget.nuntioStyle.buttonWidth,
                         height: widget.nuntioStyle.buttonHeight,
                         child: NuntioButton(
-                            color: widget.nuntioColor.secondaryColor,
-                            filled: true,
-                            disabledTipnote: widget
-                                .nuntioText.registerDisabledTipNoteMessage,
-                            disabled: (!passwordMatch ||
-                                !containsSpecial ||
-                                !containsNumber ||
-                                !containsEightCharacters),
-                            onPressed: onRegister,
-                            child: isLoading
-                                ? NuntioIndicator(
-                                    color: widget.nuntioTextStyle
-                                        .registerButtonTextStyle.color,
-                                  )
-                                : Text(
-                                    widget.nuntioText.registerButton,
-                                    style: widget.nuntioTextStyle
-                                        .registerButtonTextStyle,
-                                  )),
+                          color: widget.nuntioColor.secondaryColor,
+                          filled: true,
+                          disabledTipnote:
+                              widget.nuntioText.registerDisabledTipNoteMessage,
+                          disabled: (!passwordMatch ||
+                              !containsSpecial ||
+                              !containsNumber ||
+                              !containsEightCharacters),
+                          onPressed: onRegister,
+                          child: isLoading
+                              ? NuntioIndicator(
+                                  color: widget.nuntioTextStyle
+                                      .registerButtonTextStyle.color,
+                                )
+                              : Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      widget.nuntioText.registerButton,
+                                      style: widget.nuntioTextStyle
+                                          .registerButtonTextStyle,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    SizedBox(width: 8),
+                                    FaIcon(
+                                      FontAwesomeIcons.arrowRight,
+                                      size: 15,
+                                      color: widget.nuntioTextStyle
+                                          .registerButtonTextStyle.color,
+                                    ),
+                                  ],
+                                ),
+                        ),
                       ),
                       NuntioButton(
                         child: Text(

@@ -219,7 +219,7 @@ class NuntioColor {
     Color? disabledColor,
   }) {
     this.primaryColor = primaryColor ?? CupertinoColors.black;
-    this.secondaryColor = secondaryColor ?? CupertinoColors.systemGrey6;
+    this.secondaryColor = secondaryColor ?? CupertinoColors.systemBlue;
     this.successColor = successColor ?? Color(0xff0550e7);
     this.errorColor = errorColor ?? CupertinoColors.systemRed;
     this.disabledColor = disabledColor ?? CupertinoColors.lightBackgroundGray;
