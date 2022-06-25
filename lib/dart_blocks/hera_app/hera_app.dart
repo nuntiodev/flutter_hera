@@ -14,13 +14,12 @@ import '../hera_app/models.dart';
 class HeraApp extends StatefulWidget {
   HeraApp({
     Key? key,
-    required BuildContext buildContext,
     required this.child,
     required this.loginType,
-    NuntioText? nuntioText,
-    NuntioColor? nuntioColor,
-    NuntioTextStyle? nuntioTextStyle,
-    NuntioStyle? nuntioStyle,
+    this.nuntioText,
+    this.nuntioColor,
+    this.nuntioTextStyle,
+    this.nuntioStyle,
     NuntioFooter? nuntioFooter,
     this.logo,
   }) {
@@ -36,18 +35,14 @@ class HeraApp extends StatefulWidget {
       // todo: throw error hera and match on username
       identifierInputType = TextInputType.text;
     }
-    this.nuntioStyle = nuntioStyle ?? NuntioStyle(context: buildContext);
-    this.nuntioText = nuntioText ?? NuntioText();
-    this.nuntioColor = nuntioColor ?? NuntioColor(context: buildContext);
-    this.nuntioTextStyle = nuntioTextStyle ?? NuntioTextStyle(context: buildContext);
     this.nuntioFooter = nuntioFooter ?? NuntioFooter();
   }
 
   // style and text config
-  late final NuntioStyle nuntioStyle;
-  late final NuntioText nuntioText;
-  late final NuntioColor nuntioColor;
-  late final NuntioTextStyle nuntioTextStyle;
+  final NuntioStyle? nuntioStyle;
+  final NuntioText? nuntioText;
+  final NuntioColor? nuntioColor;
+  final NuntioTextStyle? nuntioTextStyle;
   late final NuntioFooter nuntioFooter;
   late TextInputType identifierInputType;
 
@@ -95,6 +90,13 @@ class _HeraAppState extends State<HeraApp> {
 
   @override
   Widget build(BuildContext context) {
+    NuntioStyle nuntioStyle =
+        widget.nuntioStyle ?? NuntioStyle(context: context);
+    NuntioText nuntioText = widget.nuntioText ?? NuntioText();
+    NuntioColor nuntioColor =
+        widget.nuntioColor ?? NuntioColor(context: context);
+    NuntioTextStyle nuntioTextStyle =
+        widget.nuntioTextStyle ?? NuntioTextStyle(context: context);
     return FutureBuilder<AuthState>(
       future: initializeNuntioUIFuture,
       builder: (BuildContext context, AsyncSnapshot<AuthState> snapshot) {
@@ -114,24 +116,23 @@ class _HeraAppState extends State<HeraApp> {
               return CupertinoApp(
                 debugShowCheckedModeBanner: false,
                 home: LoginPage(
-                  identifierInputType:
-                      widget.identifierInputType,
+                  identifierInputType: widget.identifierInputType,
                   nuntioFooter: widget.nuntioFooter,
                   logo: widget.logo ??
                       SvgPicture.network(
                         _config.logo,
-                        height: widget.nuntioStyle.logoHeight,
+                        height: nuntioStyle.logoHeight,
                         placeholderBuilder: (context) {
                           return Image(
                             image: NetworkImage(_config.logo),
-                            height: widget.nuntioStyle.logoHeight,
+                            height: nuntioStyle.logoHeight,
                           );
                         },
                       ),
-                  nuntioText: widget.nuntioText,
-                  nuntioColor: widget.nuntioColor,
-                  nuntioStyle: widget.nuntioStyle,
-                  nuntioTextStyle: widget.nuntioTextStyle,
+                  nuntioText: nuntioText,
+                  nuntioColor: nuntioColor,
+                  nuntioStyle: nuntioStyle,
+                  nuntioTextStyle: nuntioTextStyle,
                   onLogin: (BuildContext buildContext) {
                     Navigator.of(buildContext).pushReplacement(
                       CupertinoPageRoute(builder: (context) => widget.child),
@@ -142,7 +143,7 @@ class _HeraAppState extends State<HeraApp> {
                       CupertinoPageRoute(builder: (context) => widget.child),
                     );
                   },
-                  background: widget.nuntioStyle.background,
+                  background: nuntioStyle.background,
                   config: _config,
                 ),
               );
@@ -150,15 +151,15 @@ class _HeraAppState extends State<HeraApp> {
               return CupertinoApp(
                 debugShowCheckedModeBanner: false,
                 home: NoConnection(
-                  background: widget.nuntioStyle.background,
+                  background: nuntioStyle.background,
                   logo: widget.logo ??
                       Image(
                         image: NetworkImage(_config.logo),
-                        height: widget.nuntioStyle.logoHeight,
+                        height: nuntioStyle.logoHeight,
                       ),
-                  nuntioText: widget.nuntioText,
-                  nuntioTextStyle: widget.nuntioTextStyle,
-                  nuntioColor: widget.nuntioColor,
+                  nuntioText: nuntioText,
+                  nuntioTextStyle: nuntioTextStyle,
+                  nuntioColor: nuntioColor,
                 ),
               );
             }

@@ -264,7 +264,7 @@ class NuntioStyle {
     BoxDecoration? background,
   }) {
     this.borderColor = borderColor ?? (CupertinoTheme.brightnessOf(context) == Brightness.dark
-        ? CupertinoColors.darkBackgroundGray
+        ? Color(0xff1d1d1d)
         : CupertinoColors.systemGrey5);
     this.textFieldColor = textFieldColor ??
         (CupertinoTheme.brightnessOf(context) == Brightness.dark

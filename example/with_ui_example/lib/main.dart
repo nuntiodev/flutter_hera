@@ -30,7 +30,6 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       home: Builder(builder: (_context) {
         return HeraApp(
-          buildContext: _context,
           nuntioFooter: NuntioFooter(
             height: 100,
           ),
