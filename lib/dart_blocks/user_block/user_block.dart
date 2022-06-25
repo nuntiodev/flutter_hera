@@ -81,7 +81,7 @@ class UserBlock {
 
   void _setCurrentUser(dart_blocks.User currentUser) async {
     _currentUser = currentUser;
-    _secureStorage.write(
+    await _secureStorage.write(
         key: _currentUserKey, value: currentUser.writeToJson());
   }
 
@@ -99,7 +99,7 @@ class UserBlock {
 
   void _setAccessToken(String accessToken) async {
     _accessToken = accessToken;
-    _secureStorage.write(key: _accessTokenKey, value: accessToken);
+    await _secureStorage.write(key: _accessTokenKey, value: accessToken);
   }
 
   Future<String> _getRefreshToken() async {
@@ -116,7 +116,7 @@ class UserBlock {
 
   void _setRefreshToken(String refreshToken) async {
     _refreshToken = refreshToken;
-    _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
+    await _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
   }
 
   Future<dart_blocks.User> create({
@@ -392,7 +392,7 @@ class UserBlock {
       }
       req.encryptionKey = _encryptionKey ?? "";
       await _grpcUserClient.recordActiveMeasurement(req);
-      if(debug == true){
+      if (debug == true) {
         print("done sending data...");
       }
       return;

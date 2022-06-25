@@ -36,6 +36,7 @@ class NuntioTextField extends StatefulWidget {
 
 class _NuntioTextFieldState extends State<NuntioTextField> {
   FocusNode focusNode = FocusNode();
+  bool isActive = false;
   Color? activeColor;
   Color? inactiveColor;
   Color? currentColor;
@@ -49,10 +50,12 @@ class _NuntioTextFieldState extends State<NuntioTextField> {
       if (focusNode.hasFocus) {
         setState(() {
           currentColor = activeColor;
+          isActive = true;
         });
       } else {
         setState(() {
           currentColor = inactiveColor;
+          isActive = false;
         });
       }
     });
@@ -81,11 +84,13 @@ class _NuntioTextFieldState extends State<NuntioTextField> {
             obscureText: widget.obscureText ?? false,
             onTap: () {},
             decoration: textFieldDecoration(
-              Border.all(
+              border: Border.all(
                 color: currentColor ?? Colors.white,
-                width: 0.7,
+                width: 1,
               ),
-              widget.nuntioStyle.textFieldColor,
+              color: widget.nuntioStyle.textFieldColor,
+              isActive: isActive,
+              activeColor: currentColor,
             ),
             textInputAction: widget.textInputAction,
             // Moves focus to next.

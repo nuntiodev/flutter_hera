@@ -50,7 +50,7 @@ class ProfileAvatar extends StatelessWidget {
               ),
             ),
           ),
-          placeholder: (context, url) => NuntioIndicator(),
+          placeholder: (context, url) => NuntioIndicator(size: 16,),
           errorWidget: (context, url, error) {
             print(error.toString());
             return Container(

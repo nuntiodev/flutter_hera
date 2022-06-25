@@ -112,39 +112,48 @@ class _HeraAppState extends State<HeraApp> {
             if (snapshot.data == null ||
                 snapshot.data == AuthState.notAuthenticated) {
               return CupertinoApp(
-                  debugShowCheckedModeBanner: false,
-                  home: LoginPage(
-                    identifierInputType:
-                        widget.identifierInputType ?? TextInputType.emailAddress,
-                    nuntioFooter: widget.nuntioFooter,
-                    logo: widget.logo ??
-                        SvgPicture.network(
-                          _config.logo,
-                          height: widget.nuntioStyle.logoHeight,
-                          placeholderBuilder: (context) {
-                            return Image(
-                              image: NetworkImage(_config.logo),
-                              height: widget.nuntioStyle.logoHeight,
-                            );
-                          },
+                debugShowCheckedModeBanner: false,
+                home: LoginPage(
+                  identifierInputType:
+                      widget.identifierInputType ?? TextInputType.emailAddress,
+                  nuntioFooter: widget.nuntioFooter,
+                  logo: widget.logo ??
+                      SvgPicture.network(
+                        _config.logo,
+                        height: widget.nuntioStyle.logoHeight,
+                        placeholderBuilder: (context) {
+                          return Image(
+                            image: NetworkImage(_config.logo),
+                            height: widget.nuntioStyle.logoHeight,
+                          );
+                        },
+                      ),
+                  nuntioText: widget.nuntioText,
+                  nuntioColor: widget.nuntioColor,
+                  nuntioStyle: widget.nuntioStyle,
+                  nuntioTextStyle: widget.nuntioTextStyle,
+                  onLogin: (BuildContext buildContext) {
+                    Navigator.of(buildContext).pushReplacement(
+                      CupertinoPageRoute(builder: (context) => widget.child),
+                    );
+                  },
+                  onRegister: (BuildContext buildContext) {
+                    Navigator.of(buildContext).pushReplacement(
+                      CupertinoPageRoute(builder: (context) => widget.child),
+                    );
+                  },
+                  background: widget.background ??
+                      BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            CupertinoColors.white,
+                            CupertinoColors.tertiarySystemGroupedBackground,
+                          ],
                         ),
-                    nuntioText: widget.nuntioText,
-                    nuntioColor: widget.nuntioColor,
-                    nuntioStyle: widget.nuntioStyle,
-                    nuntioTextStyle: widget.nuntioTextStyle,
-                    onLogin: (BuildContext buildContext) {
-                      Navigator.of(buildContext).pushReplacement(
-                        CupertinoPageRoute(builder: (context) => widget.child),
-                      );
-                    },
-                    onRegister: (BuildContext buildContext) {
-                      Navigator.of(buildContext).pushReplacement(
-                        CupertinoPageRoute(builder: (context) => widget.child),
-                      );
-                    },
-                    background: widget.background ??
-                        BoxDecoration(color: CupertinoColors.white),
-                    config: _config,
+                      ),
+                  config: _config,
                 ),
               );
             } else {

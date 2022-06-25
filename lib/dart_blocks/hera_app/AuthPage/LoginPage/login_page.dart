@@ -205,33 +205,43 @@ class _LoginPageState extends State<LoginPage> {
                   constraints: BoxConstraints(maxWidth: 400),
                   margin: const EdgeInsets.only(
                       left: 25, right: 25, bottom: 20, top: 0),
-                  child: FadeInUp(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        widget.logo,
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FadeInUp(
+                        delay: Duration(milliseconds: 0),
+                        child: widget.logo,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      FadeInUp(
+                        delay: Duration(milliseconds: 500),
+                        child: Text(
                           widget.nuntioText.loginTitle,
                           style: widget.nuntioTextStyle.titleStyle,
                           textAlign: TextAlign.center,
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      FadeInUp(
+                        delay: Duration(milliseconds: 600),
+                        child: Text(
                           widget.nuntioText.loginDetails,
                           style: widget.nuntioTextStyle.descriptionStyle,
                           textAlign: TextAlign.center,
                         ),
-                        SizedBox(
-                          height: 30,
-                        ),
-                        if (!widget.config.disableDefaultLogin)
-                          NuntioTextField(
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      if (!widget.config.disableDefaultLogin)
+                        FadeInUp(
+                          delay: Duration(milliseconds: 700),
+                          child: NuntioTextField(
                             nuntioTextStyle: widget.nuntioTextStyle,
                             nuntioStyle: widget.nuntioStyle,
                             nuntioColor: widget.nuntioColor,
@@ -240,12 +250,15 @@ class _LoginPageState extends State<LoginPage> {
                             textInputType: widget.identifierInputType,
                             label: widget.nuntioText.identifierName,
                           ),
-                        if (!widget.config.disableDefaultLogin)
-                          const SizedBox(
-                            height: 15,
-                          ),
-                        if (!widget.config.disableDefaultLogin)
-                          NuntioTextField(
+                        ),
+                      if (!widget.config.disableDefaultLogin)
+                        const SizedBox(
+                          height: 15,
+                        ),
+                      if (!widget.config.disableDefaultLogin)
+                        FadeInUp(
+                          delay: Duration(milliseconds: 800),
+                          child: NuntioTextField(
                             nuntioTextStyle: widget.nuntioTextStyle,
                             nuntioStyle: widget.nuntioStyle,
                             nuntioColor: widget.nuntioColor,
@@ -259,12 +272,15 @@ class _LoginPageState extends State<LoginPage> {
                               onLogin();
                             },
                           ),
-                        if (!widget.config.disableDefaultLogin)
-                          const SizedBox(
-                            height: 5,
-                          ),
-                        if (!widget.config.disableDefaultLogin)
-                          Align(
+                        ),
+                      if (!widget.config.disableDefaultLogin)
+                        const SizedBox(
+                          height: 5,
+                        ),
+                      if (!widget.config.disableDefaultLogin)
+                        FadeInUp(
+                          delay: Duration(milliseconds: 900),
+                          child: Align(
                             alignment: Alignment.centerRight,
                             child: NuntioButton(
                               padding: EdgeInsets.all(0),
@@ -276,12 +292,15 @@ class _LoginPageState extends State<LoginPage> {
                               color: CupertinoColors.black,
                             ),
                           ),
-                        if (!widget.config.disableDefaultLogin)
-                          const SizedBox(
-                            height: 20,
-                          ),
-                        if (!widget.config.disableDefaultLogin)
-                          SizedBox(
+                        ),
+                      if (!widget.config.disableDefaultLogin)
+                        const SizedBox(
+                          height: 20,
+                        ),
+                      if (!widget.config.disableDefaultLogin)
+                        FadeInUp(
+                          delay: Duration(milliseconds: 1000),
+                          child: SizedBox(
                             width: widget.nuntioStyle.buttonWidth,
                             height: widget.nuntioStyle.buttonHeight,
                             child: NuntioButton(
@@ -289,7 +308,9 @@ class _LoginPageState extends State<LoginPage> {
                               filled: true,
                               onPressed: onLogin,
                               child: isLoading
-                                  ? NuntioIndicator(color: widget.nuntioTextStyle.loginButtonTextStyle.color)
+                                  ? NuntioIndicator(
+                                      color: widget.nuntioTextStyle
+                                          .loginButtonTextStyle.color)
                                   : Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
@@ -313,11 +334,14 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                             ),
                           ),
-                        SizedBox(
-                          height: 10,
                         ),
-                        if (widget.config.enableNuntioConnect)
-                          SizedBox(
+                      SizedBox(
+                        height: 10,
+                      ),
+                      if (widget.config.enableNuntioConnect)
+                        FadeInUp(
+                          delay: Duration(milliseconds: 1000),
+                          child: SizedBox(
                             width: widget.nuntioStyle.buttonWidth,
                             height: widget.nuntioStyle.buttonHeight,
                             child: CupertinoButton(
@@ -348,12 +372,15 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
-                        if (widget.config.enableNuntioConnect)
-                          SizedBox(
-                            height: 10,
-                          ),
-                        if (!widget.config.disableDefaultSignup)
-                          SizedBox(
+                        ),
+                      if (widget.config.enableNuntioConnect)
+                        SizedBox(
+                          height: 10,
+                        ),
+                      if (!widget.config.disableDefaultSignup)
+                        FadeInUp(
+                          delay: Duration(milliseconds: 1000),
+                          child: SizedBox(
                             width: widget.nuntioStyle.buttonWidth,
                             height: widget.nuntioStyle.buttonHeight,
                             child: NuntioButton(
@@ -391,8 +418,8 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
-                      ],
-                    ),
+                        ),
+                    ],
                   ),
                 ),
               ),
