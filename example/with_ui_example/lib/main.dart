@@ -3,6 +3,7 @@ import 'package:dart_blocks/dart_blocks/hera_app/models.dart';
 import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:with_ui_example/home/home.dart';
 import 'package:nuntio_blocks/block_user.pb.dart';
 
@@ -26,16 +27,12 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HeraApp(
-        brightness: Theme.of(context).brightness,
-        nuntioFooter: NuntioFooter(
-          height: 100,
-        ),
-        loginType: LoginType.LOGIN_TYPE_EMAIL_PASSWORD,
-        child: Home(),
+    return HeraApp(
+      nuntioFooter: NuntioFooter(
+        height: 100,
       ),
+      loginType: LoginType.LOGIN_TYPE_EMAIL_PASSWORD,
+      child: Home(),
     );
   }
 }

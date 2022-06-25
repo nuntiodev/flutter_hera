@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 const white = Color(0xffFFFFFF);
 const black = Color(0xff000000);
 const blue = Color(0xff007AFF);
+const letterSpacing = 1.1;
 
 class NuntioText {
   // general
@@ -171,33 +172,39 @@ class NuntioTextStyle {
     this.titleStyle = titleStyle ??
         TextStyle(
           fontWeight: FontWeight.bold,
-          fontSize: 32,
+          fontSize: 34,
           color: brightness == Brightness.dark ? white : black,
         );
     TextStyle();
     this.descriptionStyle = descriptionStyle ??
         TextStyle(
           color: Color(0xffaaacb1),
-          fontSize: 18,
+          fontSize: 22,
+          fontWeight: FontWeight.w400
         );
     this.bodyTextStyle = bodyTextStyle ??
         TextStyle(
           color: brightness == Brightness.dark ? white : black,
+          fontSize: 15
         );
     TextStyle();
     this.loginButtonTextStyle = loginButtonTextStyle ??
         TextStyle(
           color: brightness == Brightness.dark ? black : white,
           fontWeight: FontWeight.w500,
+          fontSize: 16,
         );
     this.registerButtonTextStyle = registerButtonTextStyle ??
         TextStyle(
           fontWeight: FontWeight.w500,
           color: brightness == Brightness.dark ? white : black,
+          fontSize: 16,
         );
     this.labelStyle = labelStyle ??
         TextStyle(
+          letterSpacing: letterSpacing,
           fontWeight: FontWeight.bold,
+          fontSize: 14,
           color: brightness == Brightness.dark ? white : black,
         );
   }
@@ -225,7 +232,8 @@ class NuntioColor {
     this.secondaryColor = secondaryColor ?? blue;
     this.successColor = successColor ?? blue;
     this.errorColor = errorColor ?? Color(0xffFF3B30);
-    this.disabledColor = disabledColor ?? (brightness == Brightness.dark ? Color(0xff4c4a4a) : Color(0xffd9d9dc));
+    this.disabledColor = disabledColor ??
+        (brightness == Brightness.dark ? Color(0xff5f5f61) : Color(0xffd9d9dc));
     this.activeColor = activeColor ?? Color(0xff0550e7);
   }
 }
@@ -258,27 +266,27 @@ class NuntioStyle {
     this.background = background ??
         (brightness == Brightness.dark
             ? BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  stops: [0.4, 1.0],
-                  colors: [
-                    Color(0xff000000),
-                    Color(0xff343434),
-                  ],
-                ),
-              )
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: [0.4, 1.0],
+            colors: [
+              Color(0xff000000),
+              Color(0xff343434),
+            ],
+          ),
+        )
             : BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  stops: [0.4, 1.0],
-                  colors: [
-                    Color(0xffFFFFFF),
-                    Color(0xffF1F0F0),
-                  ],
-                ),
-              ));
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: [0.4, 1.0],
+            colors: [
+              Color(0xffFFFFFF),
+              Color(0xffF1F0F0),
+            ],
+          ),
+        ));
   }
 }
 

@@ -6,6 +6,7 @@ import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:dart_blocks/dart_blocks/user_analytics/nuntio_user_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nuntio_blocks/block_user.pb.dart';
 import '../components/nuntio_indicator.dart';
@@ -21,7 +22,7 @@ class HeraApp extends StatefulWidget {
     NuntioTextStyle? nuntioTextStyle,
     NuntioStyle? nuntioStyle,
     NuntioFooter? nuntioFooter,
-    this.brightness,
+    Brightness? brightness,
     this.logo,
   }) {
     if (loginType == LoginType.LOGIN_TYPE_INVALID) {
@@ -36,10 +37,12 @@ class HeraApp extends StatefulWidget {
       // todo: throw error hera and match on username
       identifierInputType = TextInputType.text;
     }
-    this.nuntioStyle = nuntioStyle ?? NuntioStyle(brightness: brightness);
+    this.brightness = brightness ?? SchedulerBinding.instance.window.platformBrightness;
+    this.nuntioStyle = nuntioStyle ?? NuntioStyle(brightness: this.brightness);
     this.nuntioText = nuntioText ?? NuntioText();
-    this.nuntioColor = nuntioColor ?? NuntioColor(brightness: brightness);
-    this.nuntioTextStyle = nuntioTextStyle ?? NuntioTextStyle(brightness: brightness);
+    this.nuntioColor = nuntioColor ?? NuntioColor(brightness: this.brightness);
+    this.nuntioTextStyle =
+        nuntioTextStyle ?? NuntioTextStyle(brightness: this.brightness);
     this.nuntioFooter = nuntioFooter ?? NuntioFooter();
   }
 
@@ -55,7 +58,7 @@ class HeraApp extends StatefulWidget {
   final Widget child;
   final Widget? logo;
   final LoginType loginType;
-  final Brightness? brightness;
+  late final Brightness brightness;
 
   // on authenticated go to child;
   @override
@@ -96,25 +99,25 @@ class _HeraAppState extends State<HeraApp> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<AuthState>(
-      future: initializeNuntioUIFuture,
-      builder: (BuildContext context, AsyncSnapshot<AuthState> snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return Center(
-              child: NuntioIndicator(),
-            );
-          case ConnectionState.done:
-            if (snapshot.data == AuthState.authenticated) {
-              return NuntioUserAnalytics(
-                child: widget.child,
+    return CupertinoApp(
+      debugShowCheckedModeBanner: false,
+      home: FutureBuilder<AuthState>(
+        future: initializeNuntioUIFuture,
+        builder: (BuildContext context, AsyncSnapshot<AuthState> snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Center(
+                child: NuntioIndicator(),
               );
-            }
-            if (snapshot.data == null ||
-                snapshot.data == AuthState.notAuthenticated) {
-              return CupertinoApp(
-                debugShowCheckedModeBanner: false,
-                home: LoginPage(
+            case ConnectionState.done:
+              if (snapshot.data == AuthState.authenticated) {
+                return NuntioUserAnalytics(
+                  child: widget.child,
+                );
+              }
+              if (snapshot.data == null ||
+                  snapshot.data == AuthState.notAuthenticated) {
+                return LoginPage(
                   identifierInputType: widget.identifierInputType,
                   brightness: widget.brightness,
                   nuntioFooter: widget.nuntioFooter,
@@ -145,12 +148,9 @@ class _HeraAppState extends State<HeraApp> {
                   },
                   background: widget.nuntioStyle.background,
                   config: _config,
-                ),
-              );
-            } else {
-              return CupertinoApp(
-                debugShowCheckedModeBanner: false,
-                home: NoConnection(
+                );
+              } else {
+                return NoConnection(
                   background: widget.nuntioStyle.background,
                   logo: widget.logo ??
                       Image(
@@ -160,13 +160,13 @@ class _HeraAppState extends State<HeraApp> {
                   nuntioText: widget.nuntioText,
                   nuntioTextStyle: widget.nuntioTextStyle,
                   nuntioColor: widget.nuntioColor,
-                ),
-              );
-            }
-          default:
-            return Text("Error");
-        }
-      },
+                );
+              }
+            default:
+              return Text("Error");
+          }
+        },
+      ),
     );
   }
 }
