@@ -154,7 +154,7 @@ packages:
       path: "../.."
       relative: true
     source: path
-    version: "0.4.86"
+    version: "0.4.95"
   dart_jsonwebtoken:
     dependency: transitive
     description:
@@ -387,13 +387,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1"
-  google_fonts:
-    dependency: transitive
-    description:
-      name: google_fonts
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.1"
   googleapis_auth:
     dependency: transitive
     description:
@@ -479,7 +472,7 @@ packages:
     source: hosted
     version: "0.5.0"
   nuntio_blocks:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: nuntio_blocks
       url: "https://pub.dartlang.org"

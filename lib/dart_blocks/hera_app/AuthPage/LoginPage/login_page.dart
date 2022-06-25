@@ -202,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(),
               Center(
                 child: Container(
-                  constraints: BoxConstraints(maxWidth: 400),
+                  constraints: BoxConstraints(maxWidth: 450),
                   margin: const EdgeInsets.only(
                       left: 25, right: 25, bottom: 20, top: 0),
                   child: Column(
@@ -249,6 +249,8 @@ class _LoginPageState extends State<LoginPage> {
                             hint: widget.nuntioText.identifierHint,
                             textInputType: widget.identifierInputType,
                             label: widget.nuntioText.identifierName,
+                            prefix: FontAwesomeIcons.fingerprint,
+                            textInputAction: TextInputAction.next,
                           ),
                         ),
                       if (!widget.config.disableDefaultLogin)
@@ -267,6 +269,7 @@ class _LoginPageState extends State<LoginPage> {
                             textInputType: TextInputType.text,
                             label: widget.nuntioText.passwordName,
                             textInputAction: TextInputAction.done,
+                            prefix: FontAwesomeIcons.key,
                             obscureText: true,
                             onSubmitted: (_) {
                               onLogin();
@@ -289,7 +292,10 @@ class _LoginPageState extends State<LoginPage> {
                                 textAlign: TextAlign.center,
                               ),
                               onPressed: () {},
-                              color: CupertinoColors.black,
+                              color: CupertinoTheme.brightnessOf(context) ==
+                                      Brightness.light
+                                  ? CupertinoColors.black
+                                  : CupertinoColors.white,
                             ),
                           ),
                         ),

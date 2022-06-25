@@ -40,7 +40,7 @@ class NuntioButton extends StatefulWidget {
     return _NuntioButtonState(
       color: color,
       enterColor:
-          darken == true ? withDarken(color, 0.2) : color.withOpacity(0.7),
+      darken == true ? withDarken(color, 0.2) : color.withOpacity(0.7),
       exitColor: color,
     );
   }
@@ -94,14 +94,14 @@ class _NuntioButtonState extends State<NuntioButton> {
             ),
           ),
           child: CupertinoButton(
-            padding: widget.padding,
+            padding: widget.filled == true ? widget.padding : EdgeInsets.zero,
             child: widget.child,
             disabledColor: exitColor.withOpacity(0.3),
             onPressed: widget.disabled == true
                 ? null
                 : widget.loading == true
-                    ? null
-                    : widget.onPressed,
+                ? null
+                : widget.onPressed,
             color: widget.filled == true ? color : null,
           ),
         ),

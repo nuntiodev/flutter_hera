@@ -13,7 +13,7 @@ BoxDecoration textFieldDecoration({
       boxShadow: isActive == true
           ? [
               BoxShadow(
-                color: activeColor?.withOpacity(0.4) ?? CupertinoColors.activeBlue.withOpacity(0.4),
+                color: activeColor?.withOpacity(0.3) ?? CupertinoColors.activeBlue.withOpacity(0.4),
                 spreadRadius: 1,
                 blurRadius: 2,
               ),

@@ -4,6 +4,7 @@ import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:with_ui_example/home/home.dart';
+import 'package:nuntio_blocks/block_user.pb.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,19 +26,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return CupertinoApp(
       debugShowCheckedModeBanner: false,
-      home: Builder(
-        builder: (context) {
-          return HeraApp(
-            context: context,
-            nuntioFooter: NuntioFooter(
-              height: 100,
-            ),
-            child: Home(),
-          );
-        }
-      ),
+      home: Builder(builder: (_context) {
+        return HeraApp(
+          buildContext: _context,
+          nuntioFooter: NuntioFooter(
+            height: 100,
+          ),
+          loginType: LoginType.LOGIN_TYPE_EMAIL_PASSWORD,
+          child: Home(),
+        );
+      }),
     );
   }
 }

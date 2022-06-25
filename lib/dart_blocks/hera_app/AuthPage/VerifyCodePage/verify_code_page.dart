@@ -145,7 +145,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
               SizedBox(),
               Center(
                 child: Container(
-                  constraints: BoxConstraints(maxWidth: 400),
+                  constraints: BoxConstraints(maxWidth: 450),
                   margin: const EdgeInsets.only(
                       left: 20, right: 20, bottom: 20, top: 0),
                   child: Column(

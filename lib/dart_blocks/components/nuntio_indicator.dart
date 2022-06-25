@@ -3,19 +3,21 @@ import 'package:flutter/material.dart';
 
 class NuntioIndicator extends StatelessWidget {
   final Color? color;
-  final double? size;
+  late final double size;
 
-  NuntioIndicator({this.color, this.size});
+  NuntioIndicator({this.color, double? size}){
+    this.size = size ?? 23;
+  }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       child: CircularProgressIndicator(
         color: color ?? Colors.black,
-        strokeWidth: (size ?? 23 ) <= 23 ? 3.5 : (size ?? 22) <= 30 ? 4 : 6,
+        strokeWidth: size <= 20 ? 3 : size <= 23 ? 3.5 : size <= 30 ? 4 : 6,
       ),
-      height: size ?? 23,
-      width: size ?? 23,
+      height: size,
+      width: size,
     );
   }
 }

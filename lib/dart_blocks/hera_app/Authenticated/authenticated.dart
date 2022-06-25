@@ -45,7 +45,7 @@ class _AuthenticatedState extends State<Authenticated> {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return Center(
-              child: NuntioIndicator(),
+              child: NuntioIndicator(size: 18,),
             );
           case ConnectionState.done:
             if (snapshot.data != null) {

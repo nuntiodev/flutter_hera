@@ -308,7 +308,7 @@ class _RegisterPageState extends State<RegisterPage> {
               Center(
                 child: Container(
                   padding: EdgeInsets.only(top: 30),
-                  constraints: BoxConstraints(maxWidth: 400),
+                  constraints: BoxConstraints(maxWidth: 450),
                   margin: const EdgeInsets.only(
                       left: 20, right: 20, bottom: 20, top: 0),
                   child: Column(
@@ -344,6 +344,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         textInputType: TextInputType.emailAddress,
                         label: widget.nuntioText.identifierName,
                         textInputAction: TextInputAction.next,
+                        prefix: FontAwesomeIcons.fingerprint,
                       ),
                       const SizedBox(
                         height: 15,
@@ -358,6 +359,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         label: widget.nuntioText.passwordName,
                         textInputAction: TextInputAction.next,
                         onChanged: (_) => onPasswordChange(),
+                        prefix: FontAwesomeIcons.key,
                         obscureText: true,
                       ),
                       const SizedBox(
@@ -373,6 +375,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         label: widget.nuntioText.repeatPasswordName,
                         textInputAction: TextInputAction.done,
                         onChanged: (_) => onPasswordChange(),
+                        prefix: FontAwesomeIcons.repeat,
                         obscureText: true,
                         onSubmitted: (_) {
                           onRegister();

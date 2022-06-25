@@ -6,8 +6,6 @@ import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:dart_blocks/dart_blocks/user_analytics/nuntio_user_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nuntio_blocks/block_user.pb.dart';
 import '../components/nuntio_indicator.dart';
@@ -16,28 +14,32 @@ import '../hera_app/models.dart';
 class HeraApp extends StatefulWidget {
   HeraApp({
     Key? key,
-    required BuildContext context,
-    this.identifierInputType,
+    required BuildContext buildContext,
     required this.child,
+    required this.loginType,
     NuntioText? nuntioText,
     NuntioColor? nuntioColor,
     NuntioTextStyle? nuntioTextStyle,
     NuntioStyle? nuntioStyle,
     NuntioFooter? nuntioFooter,
     this.logo,
-    this.background,
   }) {
-    if (identifierInputType != null &&
-        identifierInputType != TextInputType.emailAddress &&
-        identifierInputType != TextInputType.phone &&
-        identifierInputType != TextInputType.text) {
-      throw Exception(
-          "invalid identifierInputType, value must equal TextInputType.emailAddress (email), TextInputType.phone (phone) or TextInputType.text (username)");
+    if (loginType == LoginType.LOGIN_TYPE_INVALID) {
+      identifierInputType = TextInputType.none;
+    } else if (loginType == LoginType.LOGIN_TYPE_EMAIL_PASSWORD ||
+        loginType == LoginType.LOGIN_TYPE_EMAIL_VERIFICATION_CODE) {
+      identifierInputType = TextInputType.emailAddress;
+    } else if (loginType == LoginType.LOGIN_TYPE_PHONE_PASSWORD ||
+        loginType == LoginType.LOGIN_TYPE_PHONE_VERIFICATION_CODE) {
+      identifierInputType = TextInputType.phone;
+    } else {
+      // todo: throw error hera and match on username
+      identifierInputType = TextInputType.text;
     }
-    this.nuntioStyle = nuntioStyle ?? NuntioStyle();
+    this.nuntioStyle = nuntioStyle ?? NuntioStyle(context: buildContext);
     this.nuntioText = nuntioText ?? NuntioText();
-    this.nuntioColor = nuntioColor ?? NuntioColor();
-    this.nuntioTextStyle = nuntioTextStyle ?? NuntioTextStyle(context: context);
+    this.nuntioColor = nuntioColor ?? NuntioColor(context: buildContext);
+    this.nuntioTextStyle = nuntioTextStyle ?? NuntioTextStyle(context: buildContext);
     this.nuntioFooter = nuntioFooter ?? NuntioFooter();
   }
 
@@ -47,14 +49,12 @@ class HeraApp extends StatefulWidget {
   late final NuntioColor nuntioColor;
   late final NuntioTextStyle nuntioTextStyle;
   late final NuntioFooter nuntioFooter;
+  late TextInputType identifierInputType;
 
   // general
   final Widget child;
   final Widget? logo;
-  final TextInputType? identifierInputType;
-
-  // style
-  final BoxDecoration? background;
+  final LoginType loginType;
 
   // on authenticated go to child;
   @override
@@ -115,7 +115,7 @@ class _HeraAppState extends State<HeraApp> {
                 debugShowCheckedModeBanner: false,
                 home: LoginPage(
                   identifierInputType:
-                      widget.identifierInputType ?? TextInputType.emailAddress,
+                      widget.identifierInputType,
                   nuntioFooter: widget.nuntioFooter,
                   logo: widget.logo ??
                       SvgPicture.network(
@@ -142,17 +142,7 @@ class _HeraAppState extends State<HeraApp> {
                       CupertinoPageRoute(builder: (context) => widget.child),
                     );
                   },
-                  background: widget.background ??
-                      BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            CupertinoColors.white,
-                            CupertinoColors.tertiarySystemGroupedBackground,
-                          ],
-                        ),
-                      ),
+                  background: widget.nuntioStyle.background,
                   config: _config,
                 ),
               );
@@ -160,8 +150,7 @@ class _HeraAppState extends State<HeraApp> {
               return CupertinoApp(
                 debugShowCheckedModeBanner: false,
                 home: NoConnection(
-                  background: widget.background ??
-                      BoxDecoration(color: CupertinoColors.white),
+                  background: widget.nuntioStyle.background,
                   logo: widget.logo ??
                       Image(
                         image: NetworkImage(_config.logo),

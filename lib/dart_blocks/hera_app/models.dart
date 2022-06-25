@@ -159,19 +159,22 @@ class NuntioTextStyle {
   late TextStyle labelStyle;
 
   NuntioTextStyle({
+    required BuildContext context,
     TextStyle? titleStyle,
     TextStyle? descriptionStyle,
     TextStyle? bodyTextStyle,
     TextStyle? loginButtonTextStyle,
     TextStyle? registerButtonTextStyle,
     TextStyle? labelStyle,
-    required BuildContext context,
   }) {
     this.titleStyle = titleStyle ??
-        Theme.of(context)
-            .textTheme
-            .titleLarge
-            ?.copyWith(fontWeight: FontWeight.bold, fontSize: 32) ??
+        Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              color: CupertinoTheme.brightnessOf(context) == Brightness.dark
+                  ? CupertinoColors.white
+                  : CupertinoColors.black,
+            ) ??
         TextStyle();
     this.descriptionStyle = descriptionStyle ??
         Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -180,26 +183,35 @@ class NuntioTextStyle {
             ) ??
         TextStyle();
     this.bodyTextStyle = bodyTextStyle ??
-        Theme.of(context)
-            .textTheme
-            .bodyText1
-            ?.copyWith(color: CupertinoColors.black) ??
+        Theme.of(context).textTheme.bodyText1?.copyWith(
+              color: CupertinoTheme.brightnessOf(context) == Brightness.dark
+                  ? CupertinoColors.white
+                  : CupertinoColors.black,
+            ) ??
         TextStyle();
     this.loginButtonTextStyle = loginButtonTextStyle ??
         Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: CupertinoColors.white, fontWeight: FontWeight.w500) ??
+              color: CupertinoTheme.brightnessOf(context) == Brightness.dark
+                  ? CupertinoColors.black
+                  : CupertinoColors.white,
+              fontWeight: FontWeight.w500,
+            ) ??
         TextStyle();
     this.registerButtonTextStyle = registerButtonTextStyle ??
-        Theme.of(context)
-            .textTheme
-            .titleMedium
-            ?.copyWith(fontWeight: FontWeight.w500) ??
+        Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w500,
+              color: CupertinoTheme.brightnessOf(context) == Brightness.dark
+                  ? CupertinoColors.white
+                  : CupertinoColors.black,
+            ) ??
         TextStyle();
     this.labelStyle = labelStyle ??
-        Theme.of(context)
-            .textTheme
-            .labelLarge
-            ?.copyWith(fontWeight: FontWeight.bold) ??
+        Theme.of(context).textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: CupertinoTheme.brightnessOf(context) == Brightness.dark
+                  ? CupertinoColors.white
+                  : CupertinoColors.black,
+            ) ??
         TextStyle();
   }
 }
@@ -210,19 +222,26 @@ class NuntioColor {
   late Color successColor;
   late Color errorColor;
   late Color disabledColor;
+  late Color activeColor;
 
   NuntioColor({
+    required BuildContext context,
     Color? primaryColor,
     Color? secondaryColor,
     Color? successColor,
     Color? errorColor,
     Color? disabledColor,
+    Color? activeColor,
   }) {
-    this.primaryColor = primaryColor ?? CupertinoColors.black;
+    this.primaryColor = primaryColor ??
+        (CupertinoTheme.brightnessOf(context) == Brightness.dark
+            ? CupertinoColors.white
+            : CupertinoColors.black);
     this.secondaryColor = secondaryColor ?? CupertinoColors.systemBlue;
-    this.successColor = successColor ?? Color(0xff0550e7);
+    this.successColor = successColor ?? CupertinoColors.activeBlue;
     this.errorColor = errorColor ?? CupertinoColors.systemRed;
     this.disabledColor = disabledColor ?? CupertinoColors.lightBackgroundGray;
+    this.activeColor = activeColor ?? Color(0xff0550e7);
   }
 }
 
@@ -232,20 +251,52 @@ class NuntioStyle {
   late double buttonWidth;
   late double buttonHeight;
   late double logoHeight;
+  late BoxDecoration background;
 
   NuntioStyle({
+    required BuildContext context,
     Border? border,
     Color? borderColor,
     Color? textFieldColor,
     double? buttonWidth,
     double? buttonHeight,
     double? logoHeight,
+    BoxDecoration? background,
   }) {
-    this.borderColor = borderColor ?? CupertinoColors.systemGrey5;
-    this.textFieldColor = textFieldColor ?? CupertinoColors.white;
+    this.borderColor = borderColor ?? (CupertinoTheme.brightnessOf(context) == Brightness.dark
+        ? CupertinoColors.darkBackgroundGray
+        : CupertinoColors.systemGrey5);
+    this.textFieldColor = textFieldColor ??
+        (CupertinoTheme.brightnessOf(context) == Brightness.dark
+            ? CupertinoColors.black
+            : CupertinoColors.white);
     this.buttonWidth = buttonWidth ?? double.infinity;
-    this.buttonHeight = buttonHeight ?? 50;
+    this.buttonHeight = buttonHeight ?? 48;
     this.logoHeight = logoHeight ?? 120;
+    this.background = background ??
+        (CupertinoTheme.brightnessOf(context) == Brightness.dark
+            ? BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  stops: [0.4, 1.0],
+                  colors: [
+                    Color(0xff000000),
+                    Color(0xff343434),
+                  ],
+                ),
+              )
+            : BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  stops: [0.4, 1.0],
+                  colors: [
+                    Color(0xffFFFFFF),
+                    Color(0xffF1F0F0),
+                  ],
+                ),
+              ));
   }
 }
 
