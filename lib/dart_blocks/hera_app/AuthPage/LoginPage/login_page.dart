@@ -26,7 +26,8 @@ class LoginPage extends StatefulWidget {
     required this.background,
     required this.onLogin,
     required this.onRegister,
-  }) : super(key: key);
+    this.brightness,
+  }) {}
 
   // style and text config
   final NuntioStyle nuntioStyle;
@@ -39,6 +40,7 @@ class LoginPage extends StatefulWidget {
   final Widget logo;
   final Config config;
   final TextInputType identifierInputType;
+  final Brightness? brightness;
 
   // style
   final BoxDecoration background;
@@ -242,6 +244,7 @@ class _LoginPageState extends State<LoginPage> {
                         FadeInUp(
                           delay: Duration(milliseconds: 700),
                           child: NuntioTextField(
+                            brightness: widget.brightness,
                             nuntioTextStyle: widget.nuntioTextStyle,
                             nuntioStyle: widget.nuntioStyle,
                             nuntioColor: widget.nuntioColor,
@@ -261,6 +264,7 @@ class _LoginPageState extends State<LoginPage> {
                         FadeInUp(
                           delay: Duration(milliseconds: 800),
                           child: NuntioTextField(
+                            brightness: widget.brightness,
                             nuntioTextStyle: widget.nuntioTextStyle,
                             nuntioStyle: widget.nuntioStyle,
                             nuntioColor: widget.nuntioColor,
@@ -292,8 +296,7 @@ class _LoginPageState extends State<LoginPage> {
                                 textAlign: TextAlign.center,
                               ),
                               onPressed: () {},
-                              color: CupertinoTheme.brightnessOf(context) ==
-                                      Brightness.light
+                              color: widget.brightness == Brightness.light
                                   ? CupertinoColors.black
                                   : CupertinoColors.white,
                             ),
@@ -391,6 +394,7 @@ class _LoginPageState extends State<LoginPage> {
                             height: widget.nuntioStyle.buttonHeight,
                             child: NuntioButton(
                               color: widget.nuntioColor.secondaryColor,
+                              disabled: isLoading,
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -403,6 +407,7 @@ class _LoginPageState extends State<LoginPage> {
                                       background: widget.background,
                                       onRegister: widget.onRegister,
                                       config: widget.config,
+                                      brightness: widget.brightness,
                                       nuntioTextStyle: widget.nuntioTextStyle,
                                       nuntioFooter: widget.nuntioFooter,
                                       onLogin: widget.onLogin,
@@ -410,17 +415,11 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 );
                               },
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    widget.nuntioText.registerButton,
-                                    style: widget.nuntioTextStyle
-                                        .registerButtonTextStyle,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
+                              child: Text(
+                                widget.nuntioText.registerButton,
+                                style: widget
+                                    .nuntioTextStyle.registerButtonTextStyle,
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),

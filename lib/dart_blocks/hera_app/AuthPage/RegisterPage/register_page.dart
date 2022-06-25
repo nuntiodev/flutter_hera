@@ -22,6 +22,7 @@ class RegisterPage extends StatefulWidget {
     required this.onRegister,
     required this.nuntioFooter,
     required this.onLogin,
+    this.brightness,
   }) : super(key: key);
 
   // style and text config
@@ -34,6 +35,7 @@ class RegisterPage extends StatefulWidget {
   // general
   final Widget logo;
   final Config config;
+  final Brightness? brightness;
 
   // style
   final BoxDecoration background;
@@ -345,6 +347,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         label: widget.nuntioText.identifierName,
                         textInputAction: TextInputAction.next,
                         prefix: FontAwesomeIcons.fingerprint,
+                        brightness: widget.brightness,
                       ),
                       const SizedBox(
                         height: 15,
@@ -360,6 +363,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         textInputAction: TextInputAction.next,
                         onChanged: (_) => onPasswordChange(),
                         prefix: FontAwesomeIcons.key,
+                        brightness: widget.brightness,
                         obscureText: true,
                       ),
                       const SizedBox(
@@ -376,6 +380,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         textInputAction: TextInputAction.done,
                         onChanged: (_) => onPasswordChange(),
                         prefix: FontAwesomeIcons.repeat,
+                        brightness: widget.brightness,
                         obscureText: true,
                         onSubmitted: (_) {
                           onRegister();

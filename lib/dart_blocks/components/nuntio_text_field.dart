@@ -17,6 +17,7 @@ class NuntioTextField extends StatefulWidget {
   final Function(String)? onSubmitted;
   final Function(String)? onChanged;
   final IconData? prefix;
+  final Brightness? brightness;
 
   NuntioTextField({
     required this.nuntioTextStyle,
@@ -31,6 +32,7 @@ class NuntioTextField extends StatefulWidget {
     this.onSubmitted,
     this.onChanged,
     this.prefix,
+    this.brightness,
   });
 
   @override
@@ -92,13 +94,14 @@ class _NuntioTextFieldState extends State<NuntioTextField> {
             focusNode: focusNode,
             style: TextStyle(
                 color: isActive
-                    ? CupertinoTheme.brightnessOf(context) == Brightness.light
-                        ? CupertinoColors.black
-                        : CupertinoColors.white
-                    : CupertinoTheme.brightnessOf(context) == Brightness.light
-                        ? withDarken(currentColor, .5)
-                        : CupertinoColors.systemGrey),
+                    ? widget.brightness == Brightness.dark
+                        ? white
+                        : black
+                    : widget.brightness == Brightness.dark
+                        ? Color(0xff8E8E93)
+                        : withDarken(currentColor, .5)),
             obscureText: widget.obscureText ?? false,
+            placeholderStyle: TextStyle(color: widget.nuntioColor.disabledColor),
             onTap: () {},
             prefix: widget.prefix != null
                 ? Padding(

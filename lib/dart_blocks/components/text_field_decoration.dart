@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../hera_app/models.dart';
+
 BoxDecoration textFieldDecoration({
   Border? border,
   Color? color,
@@ -13,7 +15,7 @@ BoxDecoration textFieldDecoration({
       boxShadow: isActive == true
           ? [
               BoxShadow(
-                color: activeColor?.withOpacity(0.3) ?? CupertinoColors.activeBlue.withOpacity(0.4),
+                color: activeColor?.withOpacity(0.3) ?? blue.withOpacity(0.4),
                 spreadRadius: 1,
                 blurRadius: 2,
               ),

@@ -26,17 +26,16 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return CupertinoApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Builder(builder: (_context) {
-        return HeraApp(
-          nuntioFooter: NuntioFooter(
-            height: 100,
-          ),
-          loginType: LoginType.LOGIN_TYPE_EMAIL_PASSWORD,
-          child: Home(),
-        );
-      }),
+      home: HeraApp(
+        brightness: Theme.of(context).brightness,
+        nuntioFooter: NuntioFooter(
+          height: 100,
+        ),
+        loginType: LoginType.LOGIN_TYPE_EMAIL_PASSWORD,
+        child: Home(),
+      ),
     );
   }
 }

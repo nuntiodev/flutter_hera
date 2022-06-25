@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../models.dart';
 import '../profile_avatar/profile_avatar.dart';
 
 class ProfileCard extends StatelessWidget {
@@ -54,7 +55,7 @@ class ProfileCard extends StatelessWidget {
             ProfileAvatar(
               imageUrl: image ?? "",
               background: BoxDecoration(
-                color: CupertinoColors.white.withOpacity(0.2),
+                color: white.withOpacity(0.2),
               ),
               //border: Border.all(color: CupertinoColors.black, width: 1.5),
               radius: 44,
