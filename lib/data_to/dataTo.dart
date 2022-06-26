@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:nuntio_blocks/block_user.pb.dart';
+import 'package:hera_client/hera.pb.dart';
 
 void dataTo(User user, dynamic dest){
     if(user.metadata != ""){

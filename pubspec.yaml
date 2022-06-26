@@ -1,6 +1,6 @@
-name: dart_blocks
-description: An SDK written in Dart to communicate with Nuntio Blocks and Cloud
-version: 0.5.10
+name: flutter_hera
+description: An SDK written in Dart to communicate with Hera
+version: 0.0.1
 homepage: https://github.com/nuntiodev
 
 environment:
@@ -10,11 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  nuntio_blocks: ^0.0.21
-  nuntio_cloud: ^0.0.2
-  jwt_decoder: ^2.0.1
+  hera_client: ^0.0.1
+  dart_nuntio_cloud: ^0.0.2
   protobuf: ^2.0.1
   animate_do: ^2.1.0
+  sleek_circular_slider: ^2.0.1
   grpc: ^3.0.2
   cached_network_image: ^3.2.0
   fixnum: ^1.0.0

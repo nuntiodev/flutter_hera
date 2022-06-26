@@ -1,6 +1,6 @@
-import 'package:dart_blocks/dart_blocks/nuntio_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hera/hera_client.dart';
 
 import '../main.dart';
 
@@ -23,7 +23,7 @@ class Home extends StatelessWidget {
             ),
             CupertinoButton.filled(
               onPressed: () {
-                NuntioClient.userBlock.logout().then((value) => {
+                HeraClient.service.logout().then((value) => {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => MyApp()),
                   ),
